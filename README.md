@@ -8,7 +8,7 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 
 ## Features
 
-* **Global hot-key listener**: Start recording when you hold **Ctrl + Alt + Space**, stop when you release **Ctrl**.
+* **Global hot-key listener**: Start recording when you press **Ctrl + Alt + Space**, stop when you release **Ctrl**.
 * **Clipboard integration**: Automatically copies transcript to clipboard and pastes it if possible.
 * **Structured logging**: Logs events, errors, and timings to `~/.local/share/whisper_hotkey.log`.
 
