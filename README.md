@@ -20,21 +20,17 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
   * macOS (experimental)
 * **Hardware**: Any microphone input supported by ALSA.
 
-### System Dependencies
+### System & Python Dependencies
 
 ```bash
-sudo apt install sox xclip xdotool libnotify-bin python3-pip  # linux
-pip install sounddevice soundfile numpy pynput requests pyperclip pyautogui win10toast # windows
-pip install sounddevice soundfile numpy pynput requests pyperclip pyautogui # macOS
+sudo apt install sox xclip xdotool libnotify-bin python3-pip  # linux system deps
+pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win10toast # python deps  
+
+(On Linux/macOS you can omit win10toast; on Windows it gives toast notifications.)
 ```
 
 *For Wayland users*: replace `xdotool`/`xclip` with `wtype` and `wl-clipboard`.
 
-### Python Dependencies
-
-```bash
-pip3 install --user pynput requests pyperclip
-```
 
 ## Installation
 
