@@ -18,7 +18,6 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
   * Ubuntu, Linux Mint (Cinnamon or Xfce), or any X11-based Linux desktop. Wayland is partially supported (clipboard and notifications, but no cursor change).
   * Windows 10 or 11 (experimental)
   * macOS (experimental)
-* **Hardware**: Any microphone input supported by ALSA.
 
 ### System & Python Dependencies
 
@@ -31,20 +30,17 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 
 *For Wayland users*: replace `xdotool`/`xclip` with `wtype` and `wl-clipboard`.
 
-
 ## Installation
 
 0. **Install Whisper Docker container**
 
-* Must build Docker container for x86_64 architecture
-
-* Mac:
+* Mac (prebuilt docker image):
 
     ```bash
     docker run -d -p 4444:4444 --name whisper-assistant martinopensky/whisper-assistant:latest
     ```
 
-* Linux, windows:
+* Linux, windows (build docker image from source):
 
     ```bash
     git clone https://github.com/martin-opensky/whisper-assistant-vscode
