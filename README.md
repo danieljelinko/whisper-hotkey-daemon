@@ -20,7 +20,9 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 ### System Dependencies
 
 ```bash
-sudo apt install sox xclip xdotool libnotify-bin python3-pip
+sudo apt install sox xclip xdotool libnotify-bin python3-pip  # linux
+pip install sounddevice soundfile numpy pynput requests pyperclip pyautogui win10toast # windows
+pip install sounddevice soundfile numpy pynput requests pyperclip pyautogui # macOS
 ```
 
 *For Wayland users*: replace `xdotool`/`xclip` with `wtype` and `wl-clipboard`.
@@ -37,6 +39,14 @@ pip3 install --user pynput requests pyperclip
 
 * Must build Docker container for x86_64 architecture
 
+* Mac:
+
+    ```bash
+    docker run -d -p 4444:4444 --name whisper-assistant martinopensky/whisper-assistant:latest
+    ```
+
+* Linux, windows:
+
     ```bash
     git clone https://github.com/martin-opensky/whisper-assistant-vscode
     cd whisper-assistant-vscode
@@ -51,7 +61,7 @@ pip3 install --user pynput requests pyperclip
    ```bash
    mkdir -p ~/.local/bin && git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git ~/.local/bin/whisper-hotkey
    cd ~/.local/bin/whisper-hotkey
-   chmod +x whisper_hotkey.py
+   chmod +x whisper_hotkey_linux.py
    ```
 
 2. **Configure environment** (if needed):
