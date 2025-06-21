@@ -14,7 +14,10 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 
 ## Prerequisites
 
-* **Operating System**: Ubuntu, Linux Mint (Cinnamon or Xfce), or any X11-based Linux desktop. Wayland is partially supported (clipboard and notifications, but no cursor change).
+* **Operating System**:
+  * Ubuntu, Linux Mint (Cinnamon or Xfce), or any X11-based Linux desktop. Wayland is partially supported (clipboard and notifications, but no cursor change).
+  * Windows 10 or 11 (experimental)
+  * macOS (experimental)
 * **Hardware**: Any microphone input supported by ALSA.
 
 ### System Dependencies
