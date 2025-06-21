@@ -107,4 +107,4 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 ## Credits
 
 * **Dockerfile & API**: [MartinOpenSky](https://github.com/martin-opensky) (whisper-assistant-vscode)
-* **Daemon script**: Dani Helinko & o4-mini
+* **Scripts**: Dani Helinko & o4-mini
