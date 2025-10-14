@@ -1,0 +1,16 @@
+[project]
+name = "whisper-hotkey-daemon"
+version = "0.1.0"
+description = "A lightweight Python daemon that records audio from your microphone on a global hot-key, sends it to a Docker-hosted Whisper transcription server, and places the resulting text in your clipboard"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pynput",
+    "pyperclip",
+    "requests",
+    "sounddevice",
+    "soundfile",
+    "numpy",
+    "pyautogui",
+    "win10toast; sys_platform == 'win32'",
+]
