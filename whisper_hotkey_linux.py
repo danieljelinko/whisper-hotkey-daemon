@@ -28,10 +28,13 @@ logging.basicConfig(
 )
 log = logging.getLogger("whisper_hotkey")
 
-def notify(title, body=""):
+def notify(title, body="", silent=False):
     try:
-        subprocess.run(["notify-send", "Whisper Hotkey",
-                        f"{title}\n{body}" if body else title])
+        cmd = ["notify-send", "Whisper Hotkey"]
+        if silent:
+            cmd.append("--hint=boolean:suppress-sound:true")
+        cmd.append(f"{title}\n{body}" if body else title)
+        subprocess.run(cmd)
     except FileNotFoundError:
         log.debug("notify-send not found")
 
@@ -58,7 +61,7 @@ def stop():
     recording.terminate(); recording.wait()
     recording = None
     log.info("Recording stopped, %d B", TMP_WAV.stat().st_size)
-    notify("Transcribing…")
+    notify("Transcribing…", silent=True)
     set_cursor("watch")
 
     try:
@@ -87,7 +90,7 @@ def stop():
         log.warning("Paste helper %s not available", PASTE_CMD[0])
 
     set_cursor("left_ptr")
-    notify("Done", text[:197] + ("…" if len(text) > 200 else ""))
+    notify("Done", text[:197] + ("…" if len(text) > 200 else ""), silent=True)
 
 # ─── Hot-key logic: start on Ctrl+Alt+Space ↓, stop on Ctrl ↑ ────────────────
 
