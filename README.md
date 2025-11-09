@@ -32,24 +32,34 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 
 ## Installation
 
-0. **Install Whisper Docker container**
+0. **Prepare the Whisper Docker container (CPU or GPU)**
 
-* Mac (prebuilt docker image):
+   The daemon talks to the Docker backend shipped in [danieljelinko/whisper-assistant-vscode](https://github.com/danieljelinko/whisper-assistant-vscode). Clone that repo and run the helper scripts it provides:
 
-    ```bash
-    docker run -d -p 4444:4444 --name whisper-assistant martinopensky/whisper-assistant:latest
-    ```
+   ```bash
+   git clone https://github.com/danieljelinko/whisper-assistant-vscode
+   cd whisper-assistant-vscode
+   ./00_install_docker_buildx.sh                     # one-time buildx prerequisites
+   # Optional: only if you actually have an NVIDIA GPU on this host
+   ./00_install_nvidia_container_toolkit.sh
+   ./01_build_whisper_docker_container_linux.sh -t whisper-assistant-local
+   ```
 
-* Linux, windows (build docker image from source):
+   *The `-t` flag picks the Docker image tag; feel free to use separate tags if you maintain CPU and GPU variants.*
 
-    ```bash
-    git clone https://github.com/martin-opensky/whisper-assistant-vscode
-    cd whisper-assistant-vscode
-    DOCKER_BUILDKIT=1 docker build -t whisper-assistant-local .
+   After the image is built you can either launch it manually or let the hotkey daemon script do it for you:
 
-    docker run -d -p 4444:4444 whisper-assistant-local # cpu
-    docker run -d -p 4444:4444 --gpus all whisper-assistant-local # gpu support
-    ```
+   ```bash
+   # Manual start (choose the variant that matches your host)
+   docker run -d -p 4444:4444 whisper-assistant-local                # CPU
+   docker run -d -p 4444:4444 --gpus all whisper-assistant-local     # GPU
+   ```
+
+   On macOS you can keep using the published image:
+
+   ```bash
+   docker run -d -p 4444:4444 --name whisper-assistant martinopensky/whisper-assistant:latest
+   ```
 
 1. **Clone or download** this repository to `~/.local/bin`:
 
@@ -63,25 +73,40 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 
    * If docker port changed set `WHISPER_API` to your transcription endpoint. Default is `http://localhost:4444/v1/audio/transcriptions`.
 
-3. **Run as script in terminal or systemd user service**
+3. **Run the launcher or daemon directly**
 
-    ```bash
-    2025-06-21 00:58:02,490 INFO: Daemon up (Wayland=False). Hold Ctrl + Alt + Space to record; release Ctrl to stop.
-    2025-06-21 00:58:05,108 INFO: Recording started (PID 74070)
+   The script `01_run_whisper_hotkey_daemon.sh` both ensures the container is up (creating it if missing) and runs the Python daemon through `uv`. It now accepts an optional `USE_GPU` flag so you can explicitly request CPU mode:
 
-    Input File     : 'default' (alsa)
-    Channels       : 2
-    Sample Rate    : 48000
-    Precision      : 16-bit
-    Sample Encoding: 16-bit Signed Integer PCM
+   ```bash
+   ./01_run_whisper_hotkey_daemon.sh      # default, requests --gpus all
+   USE_GPU=0 ./01_run_whisper_hotkey_daemon.sh   # force CPU container launch
+   ```
 
-    In:0.00% 00:00:02.90 [00:00:00.00] Out:43.6k [      |      ]        Clip:0    
-    Aborted.
-    2025-06-21 00:58:08,051 INFO: Recording stopped, 87146 B
-    2025-06-21 00:58:09,227 INFO: API call 1.05s
-    2025-06-21 00:58:09,239 INFO: Transcript copied: Hello world!
-    2025-06-21 00:58:09,241 INFO: Pasted with xdotool
-    ```
+   When a Docker container is already running you can launch the daemon alone:
+
+   ```bash
+   uv run whisper_hotkey_linux.py
+   ```
+
+   Sample log output:
+
+   ```bash
+   2025-06-21 00:58:02,490 INFO: Daemon up (Wayland=False). Hold Ctrl + Alt + Space to record; release Ctrl to stop.
+   2025-06-21 00:58:05,108 INFO: Recording started (PID 74070)
+
+   Input File     : 'default' (alsa)
+   Channels       : 2
+   Sample Rate    : 48000
+   Precision      : 16-bit
+   Sample Encoding: 16-bit Signed Integer PCM
+
+   In:0.00% 00:00:02.90 [00:00:00.00] Out:43.6k [      |      ]        Clip:0
+   Aborted.
+   2025-06-21 00:58:08,051 INFO: Recording stopped, 87146 B
+   2025-06-21 00:58:09,227 INFO: API call 1.05s
+   2025-06-21 00:58:09,239 INFO: Transcript copied: Hello world!
+   2025-06-21 00:58:09,241 INFO: Pasted with xdotool
+   ```
 
 ## Usage
 
