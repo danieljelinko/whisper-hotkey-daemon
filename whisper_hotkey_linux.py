@@ -7,6 +7,7 @@ import pyperclip
 
 API        = os.getenv("WHISPER_API",
                        "http://localhost:4444/v1/audio/transcriptions")
+LANG       = os.getenv("WHISPER_LANG", "")              # e.g. "fr", "hu"; empty = auto-detect
 SOX        = [                          
     "sox", "-t", "alsa", "default",
     "-r", "16000", "-c", "1", "-b", "16", "-e", "signed-integer",
@@ -67,8 +68,10 @@ def stop():
     try:
         with TMP_WAV.open("rb") as f:
             t0 = time.time()
+            data = {"language": LANG} if LANG else {}
             r = requests.post(API,
-                              files={"file": ("speech.wav", f, "audio/wav")})
+                              files={"file": ("speech.wav", f, "audio/wav")},
+                              data=data)
             r.raise_for_status()
             log.info("API call %.2fs", time.time() - t0)
             text = r.json().get("text", "").strip()
@@ -98,8 +101,8 @@ CTRL_KEYS = {Key.ctrl_l, Key.ctrl_r}
 ALT_KEYS  = {Key.alt_l, Key.alt_r}
 pressed   = set()                                     # currently-held keys
 
-log.info("Daemon up (Wayland=%s). Hold Ctrl + Alt + Space to record; "
-         "release Ctrl to stop.", IS_WAYLAND)
+log.info("Daemon up (Wayland=%s, lang=%s). Hold Ctrl + Alt + Space to record; "
+         "release Ctrl to stop.", IS_WAYLAND, LANG or "auto")
 
 def on_press(key):
     if key in CTRL_KEYS | ALT_KEYS | {Key.space}:

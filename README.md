@@ -9,6 +9,7 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 ## Features
 
 * **Global hot-key listener**: Start recording when you press **Ctrl + Alt + Space**, stop when you release **Ctrl**.
+* **Multi-language support**: Pass `WHISPER_LANG` to force a language (e.g. `fr`, `hu`); omit it for Whisper's automatic detection.
 * **Clipboard integration**: Automatically copies transcript to clipboard and pastes it if possible.
 * **Structured logging**: Logs events, errors, and timings to `~/.local/share/whisper_hotkey.log`.
 
@@ -78,20 +79,30 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
    The script `01_run_whisper_hotkey_daemon.sh` both ensures the container is up (creating it if missing) and runs the Python daemon through `uv`. It now accepts an optional `USE_GPU` flag so you can explicitly request CPU mode:
 
    ```bash
-   ./01_run_whisper_hotkey_daemon.sh      # default, requests --gpus all
-   USE_GPU=0 ./01_run_whisper_hotkey_daemon.sh   # force CPU container launch
+   ./01_run_whisper_hotkey_daemon.sh           # English / auto-detect, requests --gpus all
+   ./02_run_whisper_hotkey_daemon_fr.sh        # French
+   ./03_run_whisper_hotkey_daemon_hu.sh        # Hungarian
+   USE_GPU=0 ./01_run_whisper_hotkey_daemon.sh # force CPU container launch
+   ```
+
+   Any Whisper-supported language code works via the `WHISPER_LANG` env var:
+
+   ```bash
+   WHISPER_LANG=de ./01_run_whisper_hotkey_daemon.sh   # German
+   WHISPER_LANG=es ./01_run_whisper_hotkey_daemon.sh   # Spanish
    ```
 
    When a Docker container is already running you can launch the daemon alone:
 
    ```bash
    uv run whisper_hotkey_linux.py
+   WHISPER_LANG=fr uv run whisper_hotkey_linux.py
    ```
 
    Sample log output:
 
    ```bash
-   2025-06-21 00:58:02,490 INFO: Daemon up (Wayland=False). Hold Ctrl + Alt + Space to record; release Ctrl to stop.
+   2025-06-21 00:58:02,490 INFO: Daemon up (Wayland=False, lang=auto). Hold Ctrl + Alt + Space to record; release Ctrl to stop.
    2025-06-21 00:58:05,108 INFO: Recording started (PID 74070)
 
    Input File     : 'default' (alsa)
@@ -132,4 +143,4 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 ## Credits
 
 * **Dockerfile & API**: [MartinOpenSky](https://github.com/martin-opensky) (whisper-assistant-vscode)
-* **Scripts**: Dani Helinko & o4-mini
+* **Scripts**: Dani Helinko, o4-mini & Claude Sonnet
