@@ -14,6 +14,7 @@ CONTAINER_IMAGE="whisper-assistant-local"
 CONTAINER_PORT="4444:4444"
 WHISPER_API="${WHISPER_API:-http://localhost:4444/v1/audio/transcriptions}"
 GPU_MODE="${USE_GPU:-1}"
+WHISPER_MODEL="${WHISPER_MODEL:-turbo}"
 
 # Allow disabling GPU by exporting USE_GPU=0 before running the script
 GPU_ARGS=()
@@ -124,6 +125,8 @@ else
         if docker run -d \
             --name "$CONTAINER_NAME" \
             -p "$CONTAINER_PORT" \
+            -e WHISPER_MODEL="$WHISPER_MODEL" \
+            -e USE_GPU="$GPU_MODE" \
             "${GPU_ARGS[@]}" \
             "$CONTAINER_IMAGE" 2>&1; then
             echo "✓ Container created and started"

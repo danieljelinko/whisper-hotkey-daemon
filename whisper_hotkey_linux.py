@@ -68,10 +68,10 @@ def stop():
     try:
         with TMP_WAV.open("rb") as f:
             t0 = time.time()
-            params = {"language": LANG} if LANG else {}
+            data = {"language": LANG} if LANG else {}
             r = requests.post(API,
                               files={"file": ("speech.wav", f, "audio/wav")},
-                              params=params)
+                              data=data)
             r.raise_for_status()
             log.info("API call %.2fs", time.time() - t0)
             text = r.json().get("text", "").strip()
