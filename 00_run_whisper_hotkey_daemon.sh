@@ -9,12 +9,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Configuration
-CONTAINER_NAME="whisper-assistant-local"
-CONTAINER_IMAGE="whisper-assistant-local"
+WHISPER_MODEL="${WHISPER_MODEL:-turbo}"
+CONTAINER_NAME="whisper-assistant-${WHISPER_MODEL}"
+CONTAINER_IMAGE="whisper-assistant:${WHISPER_MODEL}"
 CONTAINER_PORT="4444:4444"
 WHISPER_API="${WHISPER_API:-http://localhost:4444/v1/audio/transcriptions}"
 GPU_MODE="${USE_GPU:-1}"
-WHISPER_MODEL="${WHISPER_MODEL:-turbo}"
 
 # Allow disabling GPU by exporting USE_GPU=0 before running the script
 GPU_ARGS=()
@@ -78,6 +78,17 @@ else
     fi
 fi
 
+# ─── Stop conflicting whisper containers on port 4444 ────────────────────────
+
+for cid in $(docker ps -q --filter "publish=4444"); do
+    cname=$(docker inspect --format '{{.Name}}' "$cid" | sed 's|^/||')
+    if [ "$cname" != "$CONTAINER_NAME" ]; then
+        echo "Stopping conflicting container '$cname' on port 4444..."
+        docker stop "$cname" > /dev/null
+        echo "✓ Stopped '$cname'"
+    fi
+done
+
 # ─── Check and Start Docker Container ────────────────────────────────────────
 
 echo ""
@@ -114,7 +125,7 @@ else
         fi
     else
         # Check if image exists
-        if ! docker images --format '{{.Repository}}' | grep -q "^${CONTAINER_IMAGE}$"; then
+        if ! docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "^${CONTAINER_IMAGE}$"; then
             echo "Error: Docker image '$CONTAINER_IMAGE' not found."
             echo "Please build the image first or pull it from a registry."
             exit 1
@@ -125,8 +136,7 @@ else
         if docker run -d \
             --name "$CONTAINER_NAME" \
             -p "$CONTAINER_PORT" \
-            -e WHISPER_MODEL="$WHISPER_MODEL" \
-            -e USE_GPU="$GPU_MODE" \
+            -v whisper-model-cache:/root/.cache/huggingface \
             "${GPU_ARGS[@]}" \
             "$CONTAINER_IMAGE" 2>&1; then
             echo "✓ Container created and started"
@@ -190,7 +200,7 @@ done
 
 echo ""
 echo "Starting Whisper Hotkey Daemon..."
-echo "API endpoint: $WHISPER_API"
+echo "Model: $WHISPER_MODEL | API: $WHISPER_API"
 echo "Press Ctrl+Alt+Space to record, release Ctrl to stop and transcribe"
 echo "Log file: ~/.local/share/whisper_hotkey.log"
 echo ""
