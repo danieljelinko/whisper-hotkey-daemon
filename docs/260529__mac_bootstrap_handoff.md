@@ -19,7 +19,7 @@ from HuggingFace on first transcription. The entry point is `./run.sh`.
 
 ## Current situation
 
-### The bootstrap bug (just fixed — verify it works)
+### Bootstrap bugs (just fixed — verify they work)
 
 **Symptom:** running the one-liner on a fresh Mac without Xcode CLT still
 triggered the Xcode CLT install dialog.
@@ -35,6 +35,17 @@ now checks the binary **path** — the macOS stub is always exactly `/usr/bin/gi
 a real git (from CLT or Homebrew) lands elsewhere. If the path is the stub, skip
 to the tarball. The tarball path uses `curl` + `tar` (both built into macOS, no
 CLT needed).
+
+**Second symptom:** bootstrap reached `Running installer…`, then failed with:
+`bash: install.sh: No such file or directory`.
+
+**Root cause:** the raw bootstrap script was loaded from `feat/multi-platform-backends`,
+but its internal `REPO_REF` default still pointed at `main`. The current `main`
+branch does not contain `install.sh`, so bootstrap downloaded the wrong archive.
+
+**Fix applied:** `bootstrap.sh` now checks that `install.sh` exists before
+running it, so this failure mode reports the wrong-ref/archive problem clearly.
+Once this branch is merged to `main`, the normal `main` one-liner is correct.
 
 **First thing to do:** re-run the one-liner and confirm it goes straight to the
 tarball download without touching git or triggering any CLT dialog:

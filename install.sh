@@ -16,7 +16,7 @@ WHISPER_BACKEND="${WHISPER_BACKEND:-}"
 # ─── Detect backend ───────────────────────────────────────────────────────────
 if [ -z "$WHISPER_BACKEND" ]; then
     if [ "$OS" = "Darwin" ]; then
-        WHISPER_BACKEND="whispercpp_metal"
+        WHISPER_BACKEND="mlx"
     elif command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
         WHISPER_BACKEND="docker_cuda"
     else

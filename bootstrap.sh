@@ -17,7 +17,7 @@
 #
 # Env overrides:
 #   WHISPER_INSTALL_DIR=~/my-dir   skip the directory prompt
-#   WHISPER_REF=some-branch        which git ref to fetch (default: main)
+#   WHISPER_REF=some-branch        which git ref to fetch
 #
 # Re-running is safe — each step is skipped if already done.
 # Supported OS: macOS (Apple Silicon), Linux (Ubuntu/Debian/Fedora).
@@ -109,6 +109,14 @@ echo ""
 echo "Running installer…"
 echo ""
 cd "$INSTALL_DIR"
+if [ ! -f install.sh ]; then
+    echo "Error: install.sh is missing from $INSTALL_DIR."
+    echo "Fetched ref: $REPO_REF"
+    echo "This usually means bootstrap downloaded the wrong branch or an old install directory is in the way."
+    echo "Try:"
+    echo "  WHISPER_REF=main bash bootstrap.sh"
+    exit 1
+fi
 bash install.sh
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
