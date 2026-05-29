@@ -20,6 +20,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE="$REPO_DIR/tests/fixtures/sample_speech.wav"
 PORT=14444   # non-standard port so we don't collide with a running daemon
+PIXI="$(command -v pixi 2>/dev/null || printf '%s/.pixi/bin/pixi' "$HOME")"
 
 PASS=0; FAIL=0; WARN=0
 ok()   { echo "  ✅ PASS: $1"; PASS=$((PASS+1)); }
@@ -44,19 +45,19 @@ ok "macOS version: $(sw_vers -productVersion 2>/dev/null || echo unknown)"
 
 # ─── 2. Pixi + Python deps ────────────────────────────────────────────────────
 hr; echo "2. Python environment"
-if command -v pixi >/dev/null 2>&1; then
-    ok "pixi: $(pixi --version)"
-    pixi install --quiet 2>/dev/null && ok "pixi install OK" || fail "pixi install failed"
+if [ -x "$PIXI" ]; then
+    ok "pixi: $("$PIXI" --version)"
+    "$PIXI" install --quiet 2>/dev/null && ok "pixi install OK" || fail "pixi install failed"
 else
     fail "pixi not installed. Run: ./install.sh"
 fi
 
 # ─── 3. Imports ───────────────────────────────────────────────────────────────
 hr; echo "3. Key imports"
-pixi run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
-pixi run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
+"$PIXI" run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
+"$PIXI" run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
     fail "mlx_whisper missing — is this Apple Silicon? Run: ./install.sh"
-pixi run python -c "import pynput, pyperclip, requests, sounddevice, pyautogui" 2>/dev/null && \
+"$PIXI" run python -c "import pynput, pyperclip, requests, sounddevice, pyautogui" 2>/dev/null && \
     ok "daemon deps import (pynput, pyperclip, requests, sounddevice, pyautogui)" || \
     fail "a daemon dependency failed to import"
 
@@ -71,7 +72,7 @@ if [ ! -f "$FIXTURE" ]; then
     warn "Skipping (fixture not found: $FIXTURE)"
 else
     LOG="$(mktemp)"
-    WHISPER_MLX_PORT="$PORT" pixi run python src/mlx_whisper_server.py >"$LOG" 2>&1 &
+    WHISPER_MLX_PORT="$PORT" "$PIXI" run python src/mlx_whisper_server.py >"$LOG" 2>&1 &
     SERVER_PID=$!
 
     echo -n "   Waiting for server (incl. possible model download)"
@@ -90,7 +91,7 @@ else
         RESPONSE="$(curl -sf -F "file=@$FIXTURE;type=audio/wav" \
             "http://127.0.0.1:$PORT/v1/audio/transcriptions" 2>/dev/null || echo "")"
         if echo "$RESPONSE" | grep -q '"text"'; then
-            TEXT="$(echo "$RESPONSE" | pixi run python -c \
+            TEXT="$(echo "$RESPONSE" | "$PIXI" run python -c \
                 'import sys,json; print(json.load(sys.stdin).get("text",""))' 2>/dev/null || echo "")"
             ok "Transcription response received"
             echo "      Transcript: \"$TEXT\""

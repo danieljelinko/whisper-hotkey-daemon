@@ -24,12 +24,13 @@ PRINT_ONLY=0
 for arg in "$@"; do [ "$arg" = "--print-backend" ] && PRINT_ONLY=1; done
 
 OS="$(uname -s)"
+PIXI="$(command -v pixi 2>/dev/null || printf '%s/.pixi/bin/pixi' "$HOME")"
 
 # ─── Check common dependencies ────────────────────────────────────────────────
 
 if [ "$PRINT_ONLY" = "0" ]; then
     if [ "$OS" = "Darwin" ]; then
-        command -v pixi >/dev/null || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
+        [ -x "$PIXI" ] || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
     else
         command -v uv >/dev/null || {
             echo "Error: uv is not installed (curl -LsSf https://astral.sh/uv/install.sh | sh)"
@@ -48,8 +49,8 @@ fi
 
 run_python() {
     if [ "$OS" = "Darwin" ]; then
-        command -v pixi >/dev/null || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
-        pixi run python "$@"
+        [ -x "$PIXI" ] || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
+        "$PIXI" run python "$@"
     else
         uv run python "$@"
     fi
@@ -104,6 +105,6 @@ echo "Hold Ctrl+Alt+Space to record; release Ctrl to transcribe and paste."
 echo ""
 
 case "$OS" in
-Darwin) exec pixi run python src/whisper_hotkey_mac_experimental.py ;;
+Darwin) exec "$PIXI" run python src/whisper_hotkey_mac_experimental.py ;;
 *)      exec uv run src/whisper_hotkey_linux.py ;;
 esac

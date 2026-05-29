@@ -48,12 +48,13 @@ if [ "$OS" = "Darwin" ]; then
     else
         echo "✓ pixi: $(pixi --version)"
     fi
+    PIXI="$(command -v pixi 2>/dev/null || printf '%s/.pixi/bin/pixi' "$HOME")"
 
     # Python deps — mlx-whisper installs as prebuilt wheels (no compiler).
     # The Whisper model itself downloads lazily from HuggingFace on first run.
     echo ""
     echo "── Python dependencies (incl. mlx-whisper) ──"
-    pixi install
+    "$PIXI" install
 
     echo ""
     echo "✓ macOS installation complete."

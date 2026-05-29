@@ -8,6 +8,7 @@ MLX_PORT="${WHISPER_MLX_PORT:-4444}"
 MLX_HOST="${WHISPER_MLX_HOST:-127.0.0.1}"
 MLX_DIR="${WHISPERCPP_DIR:-$HOME/.cache/whisper.cpp}"   # reuse cache dir for the server log
 MLX_PID=""
+PIXI="$(command -v pixi 2>/dev/null || printf '%s/.pixi/bin/pixi' "$HOME")"
 
 ensure_mlx_backend() {
     if curl -sf "http://localhost:${MLX_PORT}" >/dev/null 2>&1; then
@@ -18,7 +19,7 @@ ensure_mlx_backend() {
     echo "Starting mlx-whisper server (model: ${WHISPER_MLX_MODEL:-mlx-community/whisper-large-v3-turbo})…"
     echo "  (first run downloads the model from HuggingFace — may take a few minutes)"
     WHISPER_MLX_HOST="$MLX_HOST" WHISPER_MLX_PORT="$MLX_PORT" \
-        pixi run python "$SCRIPT_DIR/src/mlx_whisper_server.py" >"$MLX_DIR/mlx_server.log" 2>&1 &
+        "$PIXI" run python "$SCRIPT_DIR/src/mlx_whisper_server.py" >"$MLX_DIR/mlx_server.log" 2>&1 &
     MLX_PID=$!
     trap '[ -n "$MLX_PID" ] && kill "$MLX_PID" 2>/dev/null' EXIT
 
