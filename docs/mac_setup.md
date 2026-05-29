@@ -28,13 +28,19 @@ That's it. The bootstrap script handles everything in order:
 
 | Step | What happens |
 |---|---|
-| Xcode CLT | A dialog pops up — click **Install**, then wait ~5 min |
+| Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
+| Xcode CLT | A dialog pops up — click **Install**, then wait ~5 min (downloads ~1–2 GB: Apple's compiler, linker, `git`, and macOS SDK headers) |
 | Homebrew | Installed automatically if missing |
 | git | Installed via Homebrew if missing |
-| Clone | Repo cloned to `~/whisper-hotkey-daemon` |
+| Clone | Repo cloned to your chosen directory |
 | whisper.cpp | `brew install whisper-cpp` (Metal-accelerated, ~30 sec) |
 | Model | `ggml-large-v3-turbo-q5_0` downloaded (~570 MB) |
 | Python deps | `uv sync` installs all Python packages |
+
+> `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
+> ```
 
 Total time: ~5–10 minutes on a good connection (mostly the Xcode CLT and model download).
 
@@ -66,7 +72,7 @@ settings manually.
 ## 3. Verify with the smoke test
 
 ```bash
-cd ~/whisper-hotkey-daemon   # or wherever the repo was cloned
+cd ~/Developer/whisper-hotkey-daemon   # or wherever you chose to install
 ./scripts/test_mac_setup.sh
 ```
 

@@ -6,11 +6,15 @@
 #   curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
 #
 # What this script does:
-#   1. Installs Xcode Command Line Tools (macOS) — provides git, clang, make
-#   2. Installs Homebrew (macOS) if not present
-#   3. Installs git if not present
-#   4. Clones the repo to ~/whisper-hotkey-daemon
-#   5. Runs ./install.sh which handles everything else
+#   1. Asks where to install (default: ~/Developer/whisper-hotkey-daemon on Mac)
+#   2. Installs Xcode Command Line Tools (macOS) — provides git, clang, make
+#   3. Installs Homebrew (macOS) if not present
+#   4. Installs git if not present
+#   5. Clones the repo to the chosen directory
+#   6. Runs ./install.sh which handles everything else
+#
+# Skip the prompt by setting the directory up front:
+#   curl -fsSL .../bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
 #
 # Re-running is safe — each step is skipped if already done.
 # Supported OS: macOS (Apple Silicon or Intel), Linux (Ubuntu/Debian/Fedora).
@@ -18,14 +22,39 @@
 set -euo pipefail
 
 REPO_URL="https://github.com/danieljelinko/whisper-hotkey-daemon.git"
-INSTALL_DIR="${WHISPER_INSTALL_DIR:-$HOME/whisper-hotkey-daemon}"
 OS="$(uname -s)"
+
+# On macOS the Apple-recognised folder for dev projects is ~/Developer (Finder
+# gives it a hammer icon). On Linux, ~ keeps it simple. Either is a fine default.
+if [ "$OS" = "Darwin" ]; then DEFAULT_DIR="$HOME/Developer/whisper-hotkey-daemon"
+else                          DEFAULT_DIR="$HOME/whisper-hotkey-daemon"; fi
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
 echo "║      whisper-hotkey-daemon  bootstrap            ║"
-echo "║  Hold a key → speak → release → text is pasted  ║"
+echo "║  Hold a key → speak → release → text is pasted   ║"
 echo "╚══════════════════════════════════════════════════╝"
+echo ""
+
+# ─── Choose install directory ─────────────────────────────────────────────────
+# WHISPER_INSTALL_DIR env var skips the prompt (useful for non-interactive runs).
+# When piped via `curl | bash`, stdin is the script, so read from /dev/tty.
+if [ -n "${WHISPER_INSTALL_DIR:-}" ]; then
+    INSTALL_DIR="$WHISPER_INSTALL_DIR"
+elif [ -r /dev/tty ]; then
+    printf "Where should it install? [%s]: " "$DEFAULT_DIR"
+    read -r REPLY < /dev/tty || REPLY=""
+    INSTALL_DIR="${REPLY:-$DEFAULT_DIR}"
+else
+    INSTALL_DIR="$DEFAULT_DIR"   # non-interactive (no terminal): use default
+fi
+
+# Expand a leading ~ (read does not expand it) and any env vars.
+case "$INSTALL_DIR" in
+    "~")    INSTALL_DIR="$HOME" ;;
+    "~/"*)  INSTALL_DIR="$HOME/${INSTALL_DIR#\~/}" ;;
+esac
+
 echo ""
 echo "Install directory: $INSTALL_DIR"
 echo ""
