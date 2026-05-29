@@ -28,8 +28,19 @@ fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL+1)); }
 warn() { echo "  ⚠️  WARN: $1"; WARN=$((WARN+1)); }
 hr()   { echo ""; echo "──────────────────────────────────────────────"; }
 cache_size() {
-    du -sh "$HOME/.cache/huggingface" "$HOME/.cache/mlx" 2>/dev/null | \
+    local sizes xet_log xet_bytes xet_mb
+    sizes="$(du -sh "$HOME/.cache/huggingface" "$HOME/.cache/mlx" 2>/dev/null | \
         awk '{printf "%s=%s ", $2, $1}' | sed "s|$HOME/||g; s/[[:space:]]$//" || true
+    )"
+    xet_log="$(ls -t "$HOME"/.cache/huggingface/xet/logs/xet_*.log 2>/dev/null | head -1 || true)"
+    if [ -n "$xet_log" ]; then
+        xet_bytes="$(grep -o 'observed bytes sent so far = [0-9]*' "$xet_log" 2>/dev/null | tail -1 | awk '{print $NF}' || true)"
+        if [ -n "$xet_bytes" ]; then
+            xet_mb=$((xet_bytes / 1024 / 1024))
+            sizes="${sizes:+$sizes }xet_downloaded~${xet_mb}M"
+        fi
+    fi
+    printf "%s" "$sizes"
 }
 
 echo ""
