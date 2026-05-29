@@ -29,7 +29,7 @@ warn() { echo "  ⚠️  WARN: $1"; WARN=$((WARN+1)); }
 hr()   { echo ""; echo "──────────────────────────────────────────────"; }
 cache_size() {
     du -sh "$HOME/.cache/huggingface" "$HOME/.cache/mlx" 2>/dev/null | \
-        awk '{printf "%s=%s ", $2, $1}' | sed "s|$HOME/||g; s/[[:space:]]$//"
+        awk '{printf "%s=%s ", $2, $1}' | sed "s|$HOME/||g; s/[[:space:]]$//" || true
 }
 
 echo ""
