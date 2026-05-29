@@ -7,3 +7,5 @@
 /CLAUDE.md
 /CLAUDE.md.bak
 # END Ruler Generated Files
+__pycache__/
+*.pyc

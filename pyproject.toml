@@ -14,3 +14,12 @@ dependencies = [
     "pyautogui",
     "win10toast; sys_platform == 'win32'",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

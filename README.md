@@ -6,6 +6,38 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 
 ---
 
+## Backends by platform
+
+`run.sh` auto-detects your host and starts the right transcription backend. All backends expose
+the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daemon is unchanged.
+
+| Platform | Backend | Model | Acceleration |
+|---|---|---|---|
+| Linux + NVIDIA GPU | Docker `whisper-assistant` (existing) | faster-whisper `turbo` | CUDA |
+| Linux, no GPU | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) server (CPU build) | `ggml-large-v3-turbo-q5_0` | CPU |
+| macOS (Apple Silicon) | whisper.cpp server (Metal build) | `ggml-large-v3-turbo-q5_0` | Metal |
+
+**macOS setup** — run the install helper once before `run.sh`:
+```bash
+./101_install_whispercpp.sh   # builds whisper-server with Metal + downloads model
+./run.sh                       # auto-detects macOS → Metal backend
+```
+
+**Linux no-GPU setup:**
+```bash
+./101_install_whispercpp.sh   # builds whisper-server CPU-only + downloads model
+WHISPER_BACKEND=whispercpp_cpu ./run.sh
+```
+
+**Override / force backend:**
+```bash
+WHISPER_BACKEND=whispercpp_cpu ./run.sh    # force whisper.cpp even on a GPU machine
+WHISPER_BACKEND=docker_cuda ./run.sh       # force Docker CUDA
+./run.sh --print-backend                   # print selected backend and exit (no daemon)
+```
+
+---
+
 ## Features
 
 * **Global hot-key listener**: Start recording when you press **Ctrl + Alt + Space**, stop when you release **Ctrl**.
@@ -74,26 +106,23 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 
    * If docker port changed set `WHISPER_API` to your transcription endpoint. Default is `http://localhost:4444/v1/audio/transcriptions`.
 
-3. **Run the launcher or daemon directly**
-
-   The script `01_run_whisper_hotkey_daemon.sh` both ensures the container is up (creating it if missing) and runs the Python daemon through `uv`. It now accepts an optional `USE_GPU` flag so you can explicitly request CPU mode:
+3. **Run**
 
    ```bash
-   ./01_run_whisper_hotkey_daemon.sh           # English / auto-detect, requests --gpus all
-   ./02_run_whisper_hotkey_daemon_fr.sh        # French
-   ./03_run_whisper_hotkey_daemon_hu.sh        # Hungarian
-   USE_GPU=0 ./01_run_whisper_hotkey_daemon.sh # force CPU container launch
+   ./run.sh                        # auto-detects platform and backend
+   WHISPER_LANG=fr ./run.sh        # French
+   WHISPER_LANG=hu ./run.sh        # Hungarian
+   WHISPER_LANG=de ./run.sh        # any Whisper-supported language code
+   USE_GPU=0 ./run.sh              # force CPU Docker container (Linux only)
    ```
 
-   Any Whisper-supported language code works via the `WHISPER_LANG` env var:
-
+   Legacy per-language scripts still work as thin wrappers:
    ```bash
-   WHISPER_LANG=de ./01_run_whisper_hotkey_daemon.sh   # German
-   WHISPER_LANG=es ./01_run_whisper_hotkey_daemon.sh   # Spanish
+   ./02_run_whisper_hotkey_daemon_fr.sh   # sets WHISPER_LANG=fr then calls run.sh
+   ./03_run_whisper_hotkey_daemon_hu.sh   # sets WHISPER_LANG=hu then calls run.sh
    ```
 
-   When a Docker container is already running you can launch the daemon alone:
-
+   When a backend is already running you can skip the launch scripts:
    ```bash
    uv run whisper_hotkey_linux.py
    WHISPER_LANG=fr uv run whisper_hotkey_linux.py
