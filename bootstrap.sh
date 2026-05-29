@@ -8,12 +8,12 @@
 # What this script does:
 #   1. Asks where to install (default: ~/Developer/whisper-hotkey-daemon on Mac)
 #   2. Fetches the repo — git clone if git exists, else a curl tarball (no Xcode CLT!)
-#   3. Runs ./install.sh (installs uv + Python wheels incl. mlx-whisper)
+#   3. Runs ./install.sh (installs Pixi + Python wheels incl. mlx-whisper on macOS)
 #
 # Notably, the default macOS path needs NO Xcode Command Line Tools and NO
-# Homebrew: the tarball comes via curl (built in) and mlx-whisper installs as
-# prebuilt wheels via uv. The only large download is the Whisper model itself
-# (~1.5 GB), which mlx fetches on first transcription.
+# Homebrew: the tarball comes via curl (built in), Pixi provides Python, and
+# mlx-whisper installs as prebuilt wheels. The only large download is the Whisper
+# model itself (~1.5 GB), which mlx fetches on first transcription.
 #
 # Env overrides:
 #   WHISPER_INSTALL_DIR=~/my-dir   skip the directory prompt
@@ -92,7 +92,11 @@ fetch_repo() {
         echo "git not available — downloading tarball with curl (no Xcode CLT needed)…"
         local url="https://github.com/${REPO_SLUG}/archive/refs/heads/${REPO_REF}.tar.gz"
         if [ -e "$INSTALL_DIR" ] && [ -n "$(ls -A "$INSTALL_DIR" 2>/dev/null)" ]; then
-            echo "Note: $INSTALL_DIR exists and is not empty; extracting into it."
+            local backup_dir="${INSTALL_DIR}.backup.$(date +%Y%m%d%H%M%S)"
+            echo "Existing non-git install found; moving it aside for a clean install:"
+            echo "  $INSTALL_DIR"
+            echo "  → $backup_dir"
+            mv "$INSTALL_DIR" "$backup_dir"
         fi
         mkdir -p "$INSTALL_DIR"
         # --strip-components=1 drops the GitHub-added top-level dir name.

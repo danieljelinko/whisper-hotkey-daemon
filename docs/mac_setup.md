@@ -29,7 +29,7 @@ That's it. The bootstrap script handles everything in order:
 | Step | What happens |
 |---|---|
 | Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
-| Fetch | Uses `git clone` if git exists, otherwise downloads a tarball with `curl` — **no Xcode CLT required** |
+| Fetch | Uses `git clone` if git exists, otherwise downloads a clean tarball with `curl` — **no Xcode CLT required** |
 | Pixi | Installed via its standalone installer (no compiler needed) |
 | Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper** |
 
@@ -44,6 +44,10 @@ touching macOS developer-tool stubs such as `python3` or `install_name_tool`.
 The only large download is the **Whisper model (~1.5 GB), fetched automatically
 from HuggingFace the first time you transcribe** — so your *first* dictation has
 a one-time delay, everything after is instant.
+
+If the install directory already exists from an older tarball install, bootstrap
+moves it aside to `whisper-hotkey-daemon.backup.<timestamp>` before extracting.
+That keeps reinstall tests clean and avoids stale files from previous attempts.
 
 > **Developers:** if you want a real git checkout (to pull/commit, e.g. continuing
 > in Claude Code), install git first with `xcode-select --install` — the bootstrap
