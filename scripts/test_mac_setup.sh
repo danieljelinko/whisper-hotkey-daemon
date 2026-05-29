@@ -46,7 +46,8 @@ ok "macOS version: $(sw_vers -productVersion 2>/dev/null || echo unknown)"
 hr; echo "2. Python environment"
 if command -v uv >/dev/null 2>&1; then
     ok "uv: $(uv --version)"
-    uv sync --quiet 2>/dev/null && ok "uv sync OK" || fail "uv sync failed"
+    uv python install 3.12 >/dev/null
+    UV_PYTHON_PREFERENCE=only-managed uv sync --python 3.12 --quiet 2>/dev/null && ok "uv sync OK" || fail "uv sync failed"
 else
     fail "uv not installed. Run: ./install.sh"
 fi

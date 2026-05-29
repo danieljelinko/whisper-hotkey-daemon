@@ -53,7 +53,10 @@ if [ "$OS" = "Darwin" ]; then
     # The Whisper model itself downloads lazily from HuggingFace on first run.
     echo ""
     echo "── Python dependencies (incl. mlx-whisper) ──"
-    uv sync
+    # Avoid macOS' /usr/bin/python3 developer-tools stub. uv's managed Python is
+    # a small standalone download and does not require Xcode Command Line Tools.
+    uv python install 3.12
+    UV_PYTHON_PREFERENCE=only-managed uv sync --python 3.12
 
     echo ""
     echo "✓ macOS installation complete."
