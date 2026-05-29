@@ -29,29 +29,32 @@ For a more detailed walkthrough see [`docs/mac_setup.md`](docs/mac_setup.md).
 `run.sh` auto-detects your host and starts the right transcription backend. All backends expose
 the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daemon is unchanged.
 
-| Platform | Backend | Model | Acceleration |
+| Platform | Default backend | Model | Acceleration |
 |---|---|---|---|
-| Linux + NVIDIA GPU | Docker `whisper-assistant` (existing) | faster-whisper `turbo` | CUDA |
+| macOS (Apple Silicon) | [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper) (installs as wheels) | `mlx-community/whisper-large-v3-turbo` | MLX (Apple GPU) |
+| Linux + NVIDIA GPU | Docker `whisper-assistant` | faster-whisper `turbo` | CUDA |
 | Linux, no GPU | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) server (CPU build) | `ggml-large-v3-turbo-q5_0` | CPU |
-| macOS (Apple Silicon) | whisper.cpp server (Metal build) | `ggml-large-v3-turbo-q5_0` | Metal |
 
-**macOS setup** — run the install helper once before `run.sh`:
+**macOS** — no Homebrew or compiler needed; the model downloads on first use:
 ```bash
-./101_install_whispercpp.sh   # builds whisper-server with Metal + downloads model
-./run.sh                       # auto-detects macOS → Metal backend
+./install.sh   # installs uv + Python wheels incl. mlx-whisper
+./run.sh       # auto-detects macOS → mlx backend
 ```
+Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then
+`WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 
 **Linux no-GPU setup:**
 ```bash
-./101_install_whispercpp.sh   # builds whisper-server CPU-only + downloads model
+./scripts/101_install_whispercpp.sh   # builds whisper-server CPU-only + downloads model
 WHISPER_BACKEND=whispercpp_cpu ./run.sh
 ```
 
 **Override / force backend:**
 ```bash
-WHISPER_BACKEND=whispercpp_cpu ./run.sh    # force whisper.cpp even on a GPU machine
-WHISPER_BACKEND=docker_cuda ./run.sh       # force Docker CUDA
-./run.sh --print-backend                   # print selected backend and exit (no daemon)
+WHISPER_BACKEND=mlx ./run.sh            # force mlx-whisper (macOS)
+WHISPER_BACKEND=whispercpp_cpu ./run.sh # force whisper.cpp CPU
+WHISPER_BACKEND=docker_cuda ./run.sh    # force Docker CUDA
+./run.sh --print-backend                # print selected backend and exit (no daemon)
 ```
 
 ---

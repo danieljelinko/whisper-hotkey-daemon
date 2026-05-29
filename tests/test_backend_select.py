@@ -2,12 +2,21 @@ import pytest
 from backend_select import select_backend, UnsupportedPlatformError
 
 
-def test_select_backend_is_whispercpp_metal_when_macos():
+def test_select_backend_is_mlx_when_macos():
     # Given a macOS host (GPU flag irrelevant on Mac)
     # When we select a backend
     result = select_backend("Darwin", has_nvidia_gpu=False)
 
-    # Then it uses the Metal whisper.cpp backend
+    # Then it defaults to the mlx-whisper backend
+    assert result == "mlx"
+
+
+def test_select_backend_allows_whispercpp_metal_override_on_macos():
+    # Given a macOS host but an explicit whisper.cpp override
+    # When we select a backend
+    result = select_backend("Darwin", has_nvidia_gpu=False, override="whispercpp_metal")
+
+    # Then the override wins (whisper.cpp Metal stays available as a fallback)
     assert result == "whispercpp_metal"
 
 

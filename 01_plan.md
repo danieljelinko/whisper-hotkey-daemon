@@ -6,13 +6,15 @@ existing `WHISPER_API` HTTP contract. The daemon is already backend-agnostic, so
 
 **Dispatch.**
 ```
-Darwin              → whisper.cpp server + Metal     (Mac-only verify)
+Darwin              → mlx-whisper (wheels)           (Mac-only verify; whispercpp_metal = fallback)
 Linux + NVIDIA GPU  → Docker + --gpus all            (existing, regression-tested here)
 Linux, no GPU       → whisper.cpp server, CPU build  (primary dev target here)
 ```
 
-**TDD leverage.** whisper.cpp is the shared artifact — CPU on Linux, Metal on Mac. Developing the
-CPU backend here de-risks Mac down to one build flag (`-DWHISPER_METAL=1`) + the Mac client.
+**TDD note.** whisper.cpp is the shared Linux artifact (CPU here, Metal fallback on Mac). The Mac
+*default* is now mlx-whisper (chosen to avoid Homebrew/Xcode-CLT/binary distribution — see
+`03_decisions.md`), which cannot run on Linux; its HTTP wrapper is tested here with the mlx call
+mocked, and the real inference is verified on-device.
 
 ## Phase 0 — L4 scaffold
 - [x] Create 01_plan / 02_progress / 03_decisions / 04_learnings
@@ -25,10 +27,13 @@ CPU backend here de-risks Mac down to one build flag (`-DWHISPER_METAL=1`) + the
 - [x] 1.5 old `00/01/02/03_*.sh` → thin wrappers calling `run.sh`
 - [x] 1.6 README "Backends by platform"
 
-## Phase 2 — Mac on-device only (cannot TDD here)
-- [ ] 2.1 whisper.cpp Metal branch in install helper; re-run contract test on the Air
-- [ ] 2.2 polish `whisper_hotkey_mac_experimental.py` + document Accessibility/Mic permissions
-- [ ] 2.3 mlx-whisper backend (`mlx_whisper_server.py` + `lib/backend_mlx.sh`) + on-device benchmark → set Mac default in 03_decisions
+## Phase 2 — mlx-whisper Mac backend
+- [x] 2.0 `mlx_whisper_server.py` (Flask, lazy mlx import) + `test_mlx_server.py` (mocked boundary)
+- [x] 2.1 `lib/backend_mlx.sh` + `run.sh` mlx case; `backend_select` Darwin→`mlx`
+- [x] 2.2 installer/bootstrap drop Homebrew on Mac (uv wheels only); `scripts/test_mac_setup.sh` for mlx
+- [ ] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
+- [ ] 2.4 **on-device:** manual hotkey→paste check; grant Mic + Accessibility; tune model/RAM on 8 GB
+- [ ] 2.5 (optional) tarball-based bootstrap to avoid `git`/Xcode-CLT entirely for end users
 
 ## Phase 3 — Optional future backends / platforms (not committed; see 03_decisions)
 All slot into the same pluggable pattern: serve OpenAI-shape `/v1/audio/transcriptions` on :4444, no

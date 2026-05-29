@@ -7,11 +7,9 @@
 #
 # What this script does:
 #   1. Asks where to install (default: ~/Developer/whisper-hotkey-daemon on Mac)
-#   2. Installs Xcode Command Line Tools (macOS) — provides git, clang, make
-#   3. Installs Homebrew (macOS) if not present
-#   4. Installs git if not present
-#   5. Clones the repo to the chosen directory
-#   6. Runs ./install.sh which handles everything else
+#   2. Installs Xcode Command Line Tools (macOS) — provides git
+#   3. Clones the repo to the chosen directory
+#   4. Runs ./install.sh (installs uv + Python wheels incl. mlx-whisper)
 #
 # Skip the prompt by setting the directory up front:
 #   curl -fsSL .../bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
@@ -62,13 +60,15 @@ echo ""
 # ─── macOS pre-requisites ─────────────────────────────────────────────────────
 if [ "$OS" = "Darwin" ]; then
 
-    # 1. Xcode Command Line Tools (provides git, clang, make)
+    # Xcode Command Line Tools — provides git (needed for the clone below) and
+    # the toolchain. The default mlx-whisper backend needs no compiler at run
+    # time, but git itself lives in CLT, so on a fresh Mac this step is required.
     if ! xcode-select -p >/dev/null 2>&1; then
-        echo "Step 1/5: Installing Xcode Command Line Tools…"
-        echo "          A dialog box will pop up — click 'Install', then come back here."
+        echo "Installing Xcode Command Line Tools (provides git)…"
+        echo "  A dialog box will pop up — click 'Install', then come back here."
         echo ""
         xcode-select --install 2>/dev/null || true
-        echo "Waiting for Xcode CLT to finish (this can take a few minutes)…"
+        echo "Waiting for Xcode CLT to finish (downloads ~1–2 GB; can take several minutes)…"
         until xcode-select -p >/dev/null 2>&1; do
             sleep 5; echo -n "."
         done
@@ -77,27 +77,7 @@ if [ "$OS" = "Darwin" ]; then
     else
         echo "✓ Xcode Command Line Tools already installed"
     fi
-
-    # 2. Homebrew
-    if ! command -v brew >/dev/null 2>&1; then
-        echo ""
-        echo "Step 2/5: Installing Homebrew…"
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        # Add brew to PATH for this shell session
-        eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null)" || \
-        eval "$(/usr/local/bin/brew shellenv 2>/dev/null)" || true
-        echo "✓ Homebrew installed"
-    else
-        echo "✓ Homebrew already installed"
-    fi
-
-    # 3. git (should be present after CLT, but belt-and-suspenders)
-    if ! command -v git >/dev/null 2>&1; then
-        echo "Step 3/5: Installing git via Homebrew…"
-        brew install git
-    else
-        echo "✓ git: $(git --version)"
-    fi
+    # No Homebrew needed: the mlx-whisper backend installs entirely via uv wheels.
 
 # ─── Linux pre-requisites ─────────────────────────────────────────────────────
 elif [ "$OS" = "Linux" ]; then

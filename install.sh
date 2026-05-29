@@ -48,16 +48,9 @@ if [ "$OS" = "Darwin" ]; then
         echo "✓ Xcode Command Line Tools: $(xcode-select -p)"
     fi
 
-    # Homebrew — also installs CLT if somehow still missing
-    if ! command -v brew >/dev/null 2>&1; then
-        echo "Installing Homebrew…"
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        # Add brew to PATH for this session
-        eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null)" || \
-        eval "$(/usr/local/bin/brew shellenv 2>/dev/null)" || true
-    else
-        echo "✓ Homebrew: $(brew --version | head -1)"
-    fi
+    # Note: the default mlx-whisper backend needs no Homebrew — uv installs
+    # everything as prebuilt wheels. (Homebrew is only needed for the optional
+    # whisper.cpp fallback via scripts/101_install_whispercpp.sh.)
 
     # uv
     if ! command -v uv >/dev/null 2>&1; then
@@ -71,17 +64,17 @@ if [ "$OS" = "Darwin" ]; then
         echo "✓ uv: $(uv --version)"
     fi
 
-    # whisper.cpp (Metal) + model
+    # Python deps — mlx-whisper installs as prebuilt wheels (no compiler).
+    # The Whisper model itself downloads lazily from HuggingFace on first run.
     echo ""
-    echo "── whisper.cpp (Metal) ──"
-    bash "$SCRIPT_DIR/scripts/101_install_whispercpp.sh"
-
-    echo ""
-    echo "── Python dependencies ──"
+    echo "── Python dependencies (incl. mlx-whisper) ──"
     uv sync
 
     echo ""
     echo "✓ macOS installation complete."
+    echo "  Backend: mlx-whisper (Apple-Silicon native; model downloads on first transcription)."
+    echo "  Tip: to use whisper.cpp instead, run scripts/101_install_whispercpp.sh and"
+    echo "       launch with WHISPER_BACKEND=whispercpp_metal ./run.sh"
     echo ""
     echo "IMPORTANT — grant two macOS permissions before running:"
     echo "  1. Microphone:   System Settings → Privacy & Security → Microphone → enable Terminal (or your terminal app)"

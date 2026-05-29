@@ -73,6 +73,11 @@ whispercpp_metal)
     source "$SCRIPT_DIR/scripts/lib/backend_whispercpp.sh"
     ensure_whispercpp_backend
     ;;
+mlx)
+    # shellcheck source=scripts/lib/backend_mlx.sh
+    source "$SCRIPT_DIR/scripts/lib/backend_mlx.sh"
+    ensure_mlx_backend
+    ;;
 *)
     echo "Error: unknown backend '$BACKEND'"; exit 1 ;;
 esac

@@ -11,8 +11,8 @@ daemon itself.
 
 Hold **Ctrl + Option + Space** → speak → release Ctrl → transcribed text is
 pasted into whatever app is in front of you. The transcription runs entirely
-locally on your Mac using a Metal-accelerated whisper.cpp server. No network
-call, no API key, no data leaving your machine.
+locally on your Mac using **mlx-whisper** (Apple's MLX framework, GPU-accelerated
+on Apple Silicon). No network call, no API key, no data leaving your machine.
 
 ---
 
@@ -29,22 +29,22 @@ That's it. The bootstrap script handles everything in order:
 | Step | What happens |
 |---|---|
 | Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
-| Xcode CLT | A dialog pops up — click **Install**, then wait ~5 min (downloads ~1–2 GB: Apple's compiler, linker, `git`, and macOS SDK headers) |
-| Homebrew | Installed automatically if missing |
-| git | Installed via Homebrew if missing |
+| Xcode CLT | A dialog pops up — click **Install**, then wait (downloads ~1–2 GB; this is just to get `git`) |
 | Clone | Repo cloned to your chosen directory |
-| whisper.cpp | `brew install whisper-cpp` (Metal-accelerated, ~30 sec) |
-| Model | `ggml-large-v3-turbo-q5_0` downloaded (~570 MB) |
-| Python deps | `uv sync` installs all Python packages |
+| uv | Installed via its standalone installer (no compiler needed) |
+| Python deps | `uv sync` installs everything as prebuilt wheels, **including mlx-whisper** |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
 > curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
 > ```
 
-Total time: ~5–10 minutes on a good connection (mostly the Xcode CLT and model download).
+No Homebrew, no compiling — mlx-whisper installs as wheels. The **Whisper model
+(~1.5 GB) downloads automatically from HuggingFace the first time you transcribe**,
+then it's cached. So your *first* dictation has a one-time delay; everything after
+is instant.
 
-**If you already have Xcode CLT, Homebrew, and git**, the script skips those steps and finishes in ~3 minutes.
+**If you already have Xcode CLT (or git)**, the script skips that step and finishes in ~2 minutes.
 
 > **Prefer manual steps?** See the [manual install section](#manual-install) at the bottom.
 
@@ -76,26 +76,25 @@ cd ~/Developer/whisper-hotkey-daemon   # or wherever you chose to install
 ./scripts/test_mac_setup.sh
 ```
 
-This script (no Python needed) checks every component:
+This script checks every component:
 
 | Check | What it verifies |
 |---|---|
 | Hardware | Apple Silicon chip detected |
-| Binary | `whisper-server` is found and executable |
-| Model | `ggml-large-v3-turbo-q5_0.bin` is present |
-| Python | `uv sync` + all imports succeed |
-| **End-to-end** | Launches the server, POSTs a real WAV, asserts text comes back |
-| Dispatch | `run.sh --print-backend` returns `whispercpp_metal` |
+| Python | `uv sync` succeeds; `mlx_whisper` and `flask` import |
+| **End-to-end** | Starts the mlx server, POSTs a real WAV, asserts text comes back (downloads the model on first run) |
+| Dispatch | `run.sh --print-backend` returns `mlx` |
 | Permissions | Prints reminder (cannot test programmatically) |
 
-All checks green? You're ready.
+All checks green? You're ready. (The first run downloads the model, so this
+test may take a few minutes the very first time.)
 
 ---
 
 ## 4. Run the daemon
 
 ```bash
-./run.sh                   # auto-detects Mac → whisper.cpp + Metal
+./run.sh                   # auto-detects Mac → mlx-whisper
 WHISPER_LANG=fr ./run.sh   # French
 WHISPER_LANG=hu ./run.sh   # Hungarian
 ```
@@ -124,22 +123,21 @@ tail -f ~/whisper_hotkey_mac.log
 - Verify the server is running: `curl -s http://localhost:4444/v1/audio/transcriptions`
   (should return a 400 or 422, not "connection refused").
 
-### Transcription is very slow (>10s)
-- Check that Metal is active: `whisper-server --help 2>&1 | grep -i metal`
-- Make sure you ran `brew install whisper-cpp` (the brew binary includes Metal).
-  If you built from source, verify `-DWHISPER_METAL=ON` was passed to cmake.
-- Check `~/whisper_hotkey_mac.log` for "GGML_METAL" lines on startup.
+### First transcription hangs for a long time
+That's the one-time model download (~1.5 GB from HuggingFace). Watch progress in
+the server log: `tail -f ~/.cache/whisper.cpp/mlx_server.log`. Once cached, later
+runs are instant. To pre-download, just run `./scripts/test_mac_setup.sh` once.
 
-### `brew: command not found` after install
-Add Homebrew to your PATH. For Apple Silicon Macs:
-```bash
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-source ~/.zprofile
-```
+### Transcription is slow even after the model is cached
+- Confirm you're on Apple Silicon (`uname -m` → `arm64`). mlx only accelerates there.
+- 8 GB Macs are tight; close memory-hungry apps. To try a smaller/faster model:
+  `WHISPER_MLX_MODEL=mlx-community/whisper-large-v3-turbo-q4 ./run.sh` (4-bit).
+- As a fallback you can switch to whisper.cpp: run `./scripts/101_install_whispercpp.sh`
+  then `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 
-### Model not found
-Re-run `./install.sh` — it will download just the missing model without
-rebuilding anything.
+### `mlx_whisper` import fails
+You're almost certainly not on Apple Silicon, or `uv sync` didn't run. mlx is
+Apple-Silicon-only. Re-run `./install.sh` on an M-series Mac.
 
 ---
 
@@ -148,24 +146,21 @@ rebuilding anything.
 If you prefer to run steps yourself instead of the bootstrap one-liner:
 
 ```bash
-# 1. Install Xcode Command Line Tools (opens a dialog — click Install)
+# 1. Install Xcode Command Line Tools (opens a dialog — click Install). Gives you git.
 xcode-select --install
 
-# 2. Install Homebrew (follow the PATH instructions it prints at the end)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-eval "$(/opt/homebrew/bin/brew shellenv)"   # Apple Silicon path
-
-# 3. Install uv
+# 2. Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.local/bin/env   # or restart Terminal
 
-# 4. Clone and install
+# 3. Clone and install (uv sync pulls mlx-whisper as wheels — no compiler, no brew)
 git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git
 cd whisper-hotkey-daemon
 ./install.sh
 ```
 
-Then continue from step 2 (Grant permissions) above.
+Then continue from step 2 (Grant permissions) above. No Homebrew required for the
+default mlx backend.
 
 ---
 
@@ -184,22 +179,24 @@ code, read:
 **Phase 1 was completed on Linux.** Everything in `src/`, `scripts/lib/`, and
 `tests/` is verified. Phase 2 is Mac-only work:
 
-1. **Verify whisper.cpp Metal** — run `./scripts/test_mac_setup.sh`. All checks
-   should pass. If they do, the backend is already working.
+1. **Verify the mlx backend** — run `./scripts/test_mac_setup.sh`. The
+   end-to-end check starts `src/mlx_whisper_server.py`, downloads the model, and
+   transcribes a real WAV. If it's green, the backend works.
 2. **Polish `src/whisper_hotkey_mac_experimental.py`** — the hotkey + recording
    + paste logic. Test the golden path manually: hold Ctrl+Option+Space in a
    text editor, speak, release Ctrl, confirm text is pasted.
-3. **mlx-whisper eval (optional)** — see `01_plan.md` Phase 2.3. Benchmark
-   whisper.cpp vs mlx-whisper on this machine. Record the winner in
-   `03_decisions.md`.
+3. **Tune the model / RAM** — on 8 GB, try `WHISPER_MLX_MODEL=...q4` variants and
+   measure latency + peak RSS. Record the chosen default in `03_decisions.md`.
 
 **Running tests:**
 ```bash
-uv run pytest            # 8 tests — 6 unit + 2 integration (whisper.cpp contract)
-bash tests/test_run_dispatch.sh   # 5 shell dispatch tests
+uv run pytest            # 11 tests — backend_select unit + mlx-server contract
+                         # (mlx-server test mocks the mlx boundary, so it runs anywhere)
+bash tests/test_run_dispatch.sh   # 6 shell dispatch tests
 ```
 
 **TDD convention:** write the failing test first, then the minimum code to pass
-it. The repo's `CLAUDE.md` has the full rules. Never mock internal code; the
-whisper.cpp contract test uses a real server and a real audio fixture
-(`tests/fixtures/sample_speech.wav`).
+it (see `CLAUDE.md`). mlx-whisper only runs on Apple Silicon, so the contract
+test for `mlx_whisper_server.py` mocks `transcribe_audio` (the hardware boundary)
+and exercises the real Flask route. The *actual* mlx transcription is only
+verified on-device via `scripts/test_mac_setup.sh`.

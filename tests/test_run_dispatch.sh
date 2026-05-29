@@ -59,9 +59,13 @@ no_nvidia
 result=$(WHISPER_BACKEND=whispercpp_cpu bash "$SCRIPT_DIR/run.sh" --print-backend 2>/dev/null)
 [ "$result" = "whispercpp_cpu" ] && ok "override WHISPER_BACKEND=whispercpp_cpu" || fail "override WHISPER_BACKEND=whispercpp_cpu (got: $result)"
 
-# Metal override (simulates Mac behaviour from Linux)
+# Metal override (simulates Mac whisper.cpp fallback from Linux)
 result=$(WHISPER_BACKEND=whispercpp_metal bash "$SCRIPT_DIR/run.sh" --print-backend 2>/dev/null)
 [ "$result" = "whispercpp_metal" ] && ok "override WHISPER_BACKEND=whispercpp_metal" || fail "override WHISPER_BACKEND=whispercpp_metal (got: $result)"
+
+# mlx override (the Mac default; simulates it from Linux)
+result=$(WHISPER_BACKEND=mlx bash "$SCRIPT_DIR/run.sh" --print-backend 2>/dev/null)
+[ "$result" = "mlx" ] && ok "override WHISPER_BACKEND=mlx" || fail "override WHISPER_BACKEND=mlx (got: $result)"
 
 # Invalid override → non-zero exit
 WHISPER_BACKEND=bogus bash "$SCRIPT_DIR/run.sh" --print-backend 2>/dev/null && \

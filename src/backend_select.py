@@ -7,8 +7,8 @@ launcher probes the real `uname` and GPU state and passes them in as args.
 import sys
 from typing import Literal
 
-Backend = Literal["docker_cuda", "whispercpp_cpu", "whispercpp_metal"]
-BACKENDS: set[str] = {"docker_cuda", "whispercpp_cpu", "whispercpp_metal"}
+Backend = Literal["docker_cuda", "whispercpp_cpu", "whispercpp_metal", "mlx"]
+BACKENDS: set[str] = {"docker_cuda", "whispercpp_cpu", "whispercpp_metal", "mlx"}
 
 
 class UnsupportedPlatformError(RuntimeError):
@@ -20,7 +20,7 @@ def select_backend(system: str, has_nvidia_gpu: bool, override: str | None = Non
     if override:
         if override not in BACKENDS: raise ValueError(f"unknown backend override: {override!r}")
         return override                                    # type: ignore[return-value]
-    if system == "Darwin": return "whispercpp_metal"       # Docker can't reach the M1 GPU
+    if system == "Darwin": return "mlx"                    # native Apple-Silicon wheels; whispercpp_metal as override
     if system == "Linux":  return "docker_cuda" if has_nvidia_gpu else "whispercpp_cpu"
     raise UnsupportedPlatformError(f"no backend for platform {system!r} (set WHISPER_BACKEND to override)")
 
