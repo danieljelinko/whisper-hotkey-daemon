@@ -7,19 +7,26 @@
 #
 # What this script does:
 #   1. Asks where to install (default: ~/Developer/whisper-hotkey-daemon on Mac)
-#   2. Installs Xcode Command Line Tools (macOS) — provides git
-#   3. Clones the repo to the chosen directory
-#   4. Runs ./install.sh (installs uv + Python wheels incl. mlx-whisper)
+#   2. Fetches the repo — git clone if git exists, else a curl tarball (no Xcode CLT!)
+#   3. Runs ./install.sh (installs uv + Python wheels incl. mlx-whisper)
 #
-# Skip the prompt by setting the directory up front:
-#   curl -fsSL .../bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
+# Notably, the default macOS path needs NO Xcode Command Line Tools and NO
+# Homebrew: the tarball comes via curl (built in) and mlx-whisper installs as
+# prebuilt wheels via uv. The only large download is the Whisper model itself
+# (~1.5 GB), which mlx fetches on first transcription.
+#
+# Env overrides:
+#   WHISPER_INSTALL_DIR=~/my-dir   skip the directory prompt
+#   WHISPER_REF=some-branch        which git ref to fetch (default: main)
 #
 # Re-running is safe — each step is skipped if already done.
-# Supported OS: macOS (Apple Silicon or Intel), Linux (Ubuntu/Debian/Fedora).
+# Supported OS: macOS (Apple Silicon), Linux (Ubuntu/Debian/Fedora).
 
 set -euo pipefail
 
-REPO_URL="https://github.com/danieljelinko/whisper-hotkey-daemon.git"
+REPO_SLUG="danieljelinko/whisper-hotkey-daemon"
+REPO_URL="https://github.com/${REPO_SLUG}.git"
+REPO_REF="${WHISPER_REF:-main}"
 OS="$(uname -s)"
 
 # On macOS the Apple-recognised folder for dev projects is ~/Developer (Finder
@@ -35,8 +42,8 @@ echo "╚═══════════════════════�
 echo ""
 
 # ─── Choose install directory ─────────────────────────────────────────────────
-# WHISPER_INSTALL_DIR env var skips the prompt (useful for non-interactive runs).
-# When piped via `curl | bash`, stdin is the script, so read from /dev/tty.
+# WHISPER_INSTALL_DIR env var skips the prompt. When piped via `curl | bash`,
+# stdin is the script, so read the answer from /dev/tty.
 if [ -n "${WHISPER_INSTALL_DIR:-}" ]; then
     INSTALL_DIR="$WHISPER_INSTALL_DIR"
 elif [ -r /dev/tty ]; then
@@ -47,7 +54,7 @@ else
     INSTALL_DIR="$DEFAULT_DIR"   # non-interactive (no terminal): use default
 fi
 
-# Expand a leading ~ (read does not expand it) and any env vars.
+# Expand a leading ~ (read does not expand it).
 case "$INSTALL_DIR" in
     "~")    INSTALL_DIR="$HOME" ;;
     "~/"*)  INSTALL_DIR="$HOME/${INSTALL_DIR#\~/}" ;;
@@ -57,53 +64,32 @@ echo ""
 echo "Install directory: $INSTALL_DIR"
 echo ""
 
-# ─── macOS pre-requisites ─────────────────────────────────────────────────────
-if [ "$OS" = "Darwin" ]; then
-
-    # Xcode Command Line Tools — provides git (needed for the clone below) and
-    # the toolchain. The default mlx-whisper backend needs no compiler at run
-    # time, but git itself lives in CLT, so on a fresh Mac this step is required.
-    if ! xcode-select -p >/dev/null 2>&1; then
-        echo "Installing Xcode Command Line Tools (provides git)…"
-        echo "  A dialog box will pop up — click 'Install', then come back here."
-        echo ""
-        xcode-select --install 2>/dev/null || true
-        echo "Waiting for Xcode CLT to finish (downloads ~1–2 GB; can take several minutes)…"
-        until xcode-select -p >/dev/null 2>&1; do
-            sleep 5; echo -n "."
-        done
-        echo ""
-        echo "✓ Xcode Command Line Tools installed"
-    else
-        echo "✓ Xcode Command Line Tools already installed"
+# ─── Fetch the repo (git if available, else tarball — no Xcode CLT) ───────────
+fetch_repo() {
+    if [ -d "$INSTALL_DIR/.git" ]; then
+        echo "✓ git checkout already at $INSTALL_DIR — pulling latest…"
+        git -C "$INSTALL_DIR" pull --ff-only && return 0
     fi
-    # No Homebrew needed: the mlx-whisper backend installs entirely via uv wheels.
 
-# ─── Linux pre-requisites ─────────────────────────────────────────────────────
-elif [ "$OS" = "Linux" ]; then
-    if ! command -v git >/dev/null 2>&1; then
-        echo "Installing git…"
-        if   command -v apt-get >/dev/null 2>&1; then sudo apt-get install -y git
-        elif command -v dnf     >/dev/null 2>&1; then sudo dnf install -y git
-        else echo "Error: git not found and no supported package manager detected."; exit 1
+    if command -v git >/dev/null 2>&1; then
+        echo "Cloning with git (ref: $REPO_REF)…"
+        git clone --branch "$REPO_REF" "$REPO_URL" "$INSTALL_DIR"
+    else
+        # No git → download a tarball with curl (built into macOS; no Xcode CLT).
+        echo "git not found — downloading a tarball with curl (no Xcode CLT needed)…"
+        local url="https://github.com/${REPO_SLUG}/archive/refs/heads/${REPO_REF}.tar.gz"
+        if [ -e "$INSTALL_DIR" ] && [ -n "$(ls -A "$INSTALL_DIR" 2>/dev/null)" ]; then
+            echo "Note: $INSTALL_DIR exists and is not empty; extracting into it."
         fi
-    else
-        echo "✓ git: $(git --version)"
+        mkdir -p "$INSTALL_DIR"
+        # --strip-components=1 drops the GitHub-added top-level dir name.
+        curl -fsSL "$url" | tar -xz --strip-components=1 -C "$INSTALL_DIR"
+        echo "✓ Downloaded to $INSTALL_DIR"
+        echo "  (No git history — to update later, re-run this bootstrap. For development,"
+        echo "   install git via 'xcode-select --install' and re-clone.)"
     fi
-else
-    echo "Error: unsupported OS '$OS'. Supported: macOS (Darwin) and Linux."
-    exit 1
-fi
-
-# ─── Clone repo ───────────────────────────────────────────────────────────────
-echo ""
-if [ -d "$INSTALL_DIR/.git" ]; then
-    echo "✓ Repo already cloned at $INSTALL_DIR — pulling latest…"
-    git -C "$INSTALL_DIR" pull --ff-only
-else
-    echo "Cloning whisper-hotkey-daemon to $INSTALL_DIR…"
-    git clone "$REPO_URL" "$INSTALL_DIR"
-fi
+}
+fetch_repo
 
 # ─── Run installer ────────────────────────────────────────────────────────────
 echo ""

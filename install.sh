@@ -32,25 +32,10 @@ echo ""
 if [ "$OS" = "Darwin" ]; then
     echo "── macOS dependencies ──"
 
-    # Xcode Command Line Tools — required for git, clang, make.
-    # The Homebrew installer below triggers the CLT install dialog automatically,
-    # but if Homebrew is already present and CLT is missing, catch it here.
-    if ! xcode-select -p >/dev/null 2>&1; then
-        echo ""
-        echo "Xcode Command Line Tools are not installed."
-        echo "Starting the install dialog now — click 'Install' in the popup that appears."
-        echo ""
-        xcode-select --install 2>/dev/null || true
-        echo "Waiting for Command Line Tools installation to complete…"
-        until xcode-select -p >/dev/null 2>&1; do sleep 5; done
-        echo "✓ Xcode Command Line Tools installed"
-    else
-        echo "✓ Xcode Command Line Tools: $(xcode-select -p)"
-    fi
-
-    # Note: the default mlx-whisper backend needs no Homebrew — uv installs
-    # everything as prebuilt wheels. (Homebrew is only needed for the optional
-    # whisper.cpp fallback via scripts/101_install_whispercpp.sh.)
+    # The default mlx-whisper backend needs NO Xcode CLT and NO Homebrew at
+    # install or run time — uv installs everything as prebuilt wheels.
+    # (Xcode CLT / Homebrew are only needed for the optional whisper.cpp fallback
+    # via scripts/101_install_whispercpp.sh, which checks for them itself.)
 
     # uv
     if ! command -v uv >/dev/null 2>&1; then

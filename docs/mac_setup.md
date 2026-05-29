@@ -29,8 +29,7 @@ That's it. The bootstrap script handles everything in order:
 | Step | What happens |
 |---|---|
 | Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
-| Xcode CLT | A dialog pops up — click **Install**, then wait (downloads ~1–2 GB; this is just to get `git`) |
-| Clone | Repo cloned to your chosen directory |
+| Fetch | Uses `git clone` if git exists, otherwise downloads a tarball with `curl` — **no Xcode CLT required** |
 | uv | Installed via its standalone installer (no compiler needed) |
 | Python deps | `uv sync` installs everything as prebuilt wheels, **including mlx-whisper** |
 
@@ -39,12 +38,15 @@ That's it. The bootstrap script handles everything in order:
 > curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
 > ```
 
-No Homebrew, no compiling — mlx-whisper installs as wheels. The **Whisper model
-(~1.5 GB) downloads automatically from HuggingFace the first time you transcribe**,
-then it's cached. So your *first* dictation has a one-time delay; everything after
-is instant.
+**No Xcode Command Line Tools, no Homebrew, no compiling.** The repo comes as a
+`curl` tarball (curl is built into macOS) and mlx-whisper installs as wheels. The
+only large download is the **Whisper model (~1.5 GB), fetched automatically from
+HuggingFace the first time you transcribe** — so your *first* dictation has a
+one-time delay, everything after is instant.
 
-**If you already have Xcode CLT (or git)**, the script skips that step and finishes in ~2 minutes.
+> **Developers:** if you want a real git checkout (to pull/commit, e.g. continuing
+> in Claude Code), install git first with `xcode-select --install` — the bootstrap
+> then uses `git clone` instead of the tarball.
 
 > **Prefer manual steps?** See the [manual install section](#manual-install) at the bottom.
 

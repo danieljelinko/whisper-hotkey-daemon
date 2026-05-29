@@ -33,7 +33,7 @@ mocked, and the real inference is verified on-device.
 - [x] 2.2 installer/bootstrap drop Homebrew on Mac (uv wheels only); `scripts/test_mac_setup.sh` for mlx
 - [ ] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
 - [ ] 2.4 **on-device:** manual hotkey→paste check; grant Mic + Accessibility; tune model/RAM on 8 GB
-- [ ] 2.5 (optional) tarball-based bootstrap to avoid `git`/Xcode-CLT entirely for end users
+- [x] 2.5 tarball-based bootstrap (curl fallback when git absent) → zero Xcode CLT for end users
 
 ## Phase 3 — Optional future backends / platforms (not committed; see 03_decisions)
 All slot into the same pluggable pattern: serve OpenAI-shape `/v1/audio/transcriptions` on :4444, no
