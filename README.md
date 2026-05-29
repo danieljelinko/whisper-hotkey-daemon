@@ -6,6 +6,24 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 
 ---
 
+## Quick install
+
+Paste this into Terminal (macOS or Linux) — it handles everything from scratch:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
+```
+
+Installs Xcode CLT (macOS), Homebrew (macOS), git, clones the repo to
+`~/whisper-hotkey-daemon`, and runs the full installer. Re-running is safe.
+
+macOS only: after install, grant **Microphone** and **Accessibility** permissions
+in System Settings → Privacy & Security before running `./run.sh`.
+
+For a more detailed walkthrough see [`docs/mac_setup.md`](docs/mac_setup.md).
+
+---
+
 ## Backends by platform
 
 `run.sh` auto-detects your host and starts the right transcription backend. All backends expose

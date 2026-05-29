@@ -32,23 +32,43 @@ echo ""
 if [ "$OS" = "Darwin" ]; then
     echo "── macOS dependencies ──"
 
-    # Homebrew
+    # Xcode Command Line Tools — required for git, clang, make.
+    # The Homebrew installer below triggers the CLT install dialog automatically,
+    # but if Homebrew is already present and CLT is missing, catch it here.
+    if ! xcode-select -p >/dev/null 2>&1; then
+        echo ""
+        echo "Xcode Command Line Tools are not installed."
+        echo "Starting the install dialog now — click 'Install' in the popup that appears."
+        echo ""
+        xcode-select --install 2>/dev/null || true
+        echo "Waiting for Command Line Tools installation to complete…"
+        until xcode-select -p >/dev/null 2>&1; do sleep 5; done
+        echo "✓ Xcode Command Line Tools installed"
+    else
+        echo "✓ Xcode Command Line Tools: $(xcode-select -p)"
+    fi
+
+    # Homebrew — also installs CLT if somehow still missing
     if ! command -v brew >/dev/null 2>&1; then
         echo "Installing Homebrew…"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        # Add brew to PATH for this session (Apple Silicon path)
-        eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
+        # Add brew to PATH for this session
+        eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null)" || \
+        eval "$(/usr/local/bin/brew shellenv 2>/dev/null)" || true
     else
-        echo "✓ Homebrew already installed"
+        echo "✓ Homebrew: $(brew --version | head -1)"
     fi
 
     # uv
     if ! command -v uv >/dev/null 2>&1; then
         echo "Installing uv…"
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        export PATH="$HOME/.cargo/bin:$PATH"
+        # Source the env file uv's installer creates, or add common paths
+        # shellcheck source=/dev/null
+        [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env" || \
+            export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
     else
-        echo "✓ uv already installed"
+        echo "✓ uv: $(uv --version)"
     fi
 
     # whisper.cpp (Metal) + model

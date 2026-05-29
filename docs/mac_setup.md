@@ -16,59 +16,35 @@ call, no API key, no data leaving your machine.
 
 ---
 
-## 1. Prerequisites — install once
+## 1. One-line install
 
-Open **Terminal** (or iTerm2, Warp, etc.).
+Open **Terminal** (search Spotlight → "Terminal"), paste this, and press Enter:
 
-### a. Homebrew
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
 ```
-After it finishes, follow the instructions it prints to add brew to your PATH
-(copy/paste the two `eval` lines it shows — needed on Apple Silicon).
 
-Verify: `brew --version`
+That's it. The bootstrap script handles everything in order:
 
-### b. uv (Python package manager)
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-Then restart your terminal or run `source $HOME/.local/bin/env` (the installer
-will tell you the exact command).
+| Step | What happens |
+|---|---|
+| Xcode CLT | A dialog pops up — click **Install**, then wait ~5 min |
+| Homebrew | Installed automatically if missing |
+| git | Installed via Homebrew if missing |
+| Clone | Repo cloned to `~/whisper-hotkey-daemon` |
+| whisper.cpp | `brew install whisper-cpp` (Metal-accelerated, ~30 sec) |
+| Model | `ggml-large-v3-turbo-q5_0` downloaded (~570 MB) |
+| Python deps | `uv sync` installs all Python packages |
 
-Verify: `uv --version`
+Total time: ~5–10 minutes on a good connection (mostly the Xcode CLT and model download).
+
+**If you already have Xcode CLT, Homebrew, and git**, the script skips those steps and finishes in ~3 minutes.
+
+> **Prefer manual steps?** See the [manual install section](#manual-install) at the bottom.
 
 ---
 
-## 2. Get the code
-
-```bash
-git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git
-cd whisper-hotkey-daemon
-```
-
----
-
-## 3. Install everything
-
-One command handles Homebrew packages, whisper.cpp (Metal build), model
-download, and Python deps:
-
-```bash
-./install.sh
-```
-
-This will:
-- `brew install whisper-cpp` (gives you a Metal-accelerated `whisper-server`)
-- Download the `ggml-large-v3-turbo-q5_0` model (~570 MB, stored in
-  `~/.cache/whisper.cpp/models/`)
-- Install Python dependencies via `uv sync`
-
-Takes ~2–5 minutes (mostly the model download).
-
----
-
-## 4. Grant macOS permissions
+## 2. Grant macOS permissions
 
 **This step is required.** Without it, the daemon starts but recording and/or
 paste will silently fail.
@@ -87,9 +63,10 @@ settings manually.
 
 ---
 
-## 5. Verify with the smoke test
+## 3. Verify with the smoke test
 
 ```bash
+cd ~/whisper-hotkey-daemon   # or wherever the repo was cloned
 ./scripts/test_mac_setup.sh
 ```
 
@@ -109,7 +86,7 @@ All checks green? You're ready.
 
 ---
 
-## 6. Run the daemon
+## 4. Run the daemon
 
 ```bash
 ./run.sh                   # auto-detects Mac → whisper.cpp + Metal
@@ -157,6 +134,32 @@ source ~/.zprofile
 ### Model not found
 Re-run `./install.sh` — it will download just the missing model without
 rebuilding anything.
+
+---
+
+## Manual install
+
+If you prefer to run steps yourself instead of the bootstrap one-liner:
+
+```bash
+# 1. Install Xcode Command Line Tools (opens a dialog — click Install)
+xcode-select --install
+
+# 2. Install Homebrew (follow the PATH instructions it prints at the end)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"   # Apple Silicon path
+
+# 3. Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.local/bin/env   # or restart Terminal
+
+# 4. Clone and install
+git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git
+cd whisper-hotkey-daemon
+./install.sh
+```
+
+Then continue from step 2 (Grant permissions) above.
 
 ---
 
