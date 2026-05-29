@@ -66,14 +66,16 @@ echo ""
 
 # ─── Fetch the repo (git if available, else tarball — no Xcode CLT) ───────────
 git_works() {
-    # On macOS, /usr/bin/git is a stub that pops up the Xcode CLT dialog and
-    # fails — command -v git finds it, but it doesn't actually work without CLT.
-    # Check xcode-select first on Darwin; on Linux a plain git --version is enough.
-    if [ "$(uname -s)" = "Darwin" ]; then
-        xcode-select -p >/dev/null 2>&1 && git --version >/dev/null 2>&1
-    else
-        git --version >/dev/null 2>&1
-    fi
+    # macOS ships /usr/bin/git as a stub: command -v finds it, xcode-select -p
+    # can return 0 with a placeholder path, but running the stub triggers the
+    # Xcode CLT install dialog. The only reliable check is the binary path itself —
+    # the stub is always exactly /usr/bin/git; a real git (CLT or Homebrew) is
+    # at /Library/Developer/CommandLineTools/usr/bin/git or /opt/homebrew/bin/git.
+    local gp
+    gp="$(command -v git 2>/dev/null || true)"
+    [ -n "$gp" ] || return 1              # no git binary at all
+    [ "$gp" = "/usr/bin/git" ] && return 1  # macOS stub — do not invoke
+    git --version >/dev/null 2>&1         # real git: verify it actually works
 }
 
 fetch_repo() {
