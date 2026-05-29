@@ -27,6 +27,10 @@ ok()   { echo "  ✅ PASS: $1"; PASS=$((PASS+1)); }
 fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL+1)); }
 warn() { echo "  ⚠️  WARN: $1"; WARN=$((WARN+1)); }
 hr()   { echo ""; echo "──────────────────────────────────────────────"; }
+cache_size() {
+    du -sh "$HOME/.cache/huggingface" "$HOME/.cache/mlx" 2>/dev/null | \
+        awk '{printf "%s=%s ", $2, $1}' | sed "s|$HOME/||g; s/[[:space:]]$//"
+}
 
 echo ""
 echo "=== whisper-hotkey-daemon Mac smoke test (mlx-whisper) ==="
@@ -88,8 +92,32 @@ else
         fail "mlx server did not become ready. Log:"; tail -15 "$LOG"
     else
         ok "mlx server ready on :$PORT"
-        RESPONSE="$(curl -sf -F "file=@$FIXTURE;type=audio/wav" \
-            "http://127.0.0.1:$PORT/v1/audio/transcriptions" 2>/dev/null || echo "")"
+        RESPONSE_FILE="$(mktemp)"
+        CURL_LOG="$(mktemp)"
+        echo "   Sending sample audio for transcription..."
+        echo "   Progress: waiting for first response; model download/inference can take several minutes."
+        START_TS="$(date +%s)"
+        curl -sf -F "file=@$FIXTURE;type=audio/wav" \
+            "http://127.0.0.1:$PORT/v1/audio/transcriptions" \
+            >"$RESPONSE_FILE" 2>"$CURL_LOG" &
+        CURL_PID=$!
+
+        while kill -0 "$CURL_PID" 2>/dev/null; do
+            NOW_TS="$(date +%s)"
+            ELAPSED=$((NOW_TS - START_TS))
+            CACHE="$(cache_size)"
+            [ -n "$CACHE" ] || CACHE="cache size not visible yet"
+            printf "   ... %4ss elapsed | server pid %s alive | %s\n" "$ELAPSED" "$SERVER_PID" "$CACHE"
+            sleep 5
+        done
+
+        if wait "$CURL_PID"; then
+            RESPONSE="$(cat "$RESPONSE_FILE")"
+        else
+            fail "Transcription request failed. curl log:"; cat "$CURL_LOG"
+            RESPONSE=""
+        fi
+
         if echo "$RESPONSE" | grep -q '"text"'; then
             TEXT="$(echo "$RESPONSE" | "$PIXI" run python -c \
                 'import sys,json; print(json.load(sys.stdin).get("text",""))' 2>/dev/null || echo "")"
