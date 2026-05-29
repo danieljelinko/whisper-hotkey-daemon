@@ -65,18 +65,29 @@ echo "Install directory: $INSTALL_DIR"
 echo ""
 
 # ─── Fetch the repo (git if available, else tarball — no Xcode CLT) ───────────
+git_works() {
+    # On macOS, /usr/bin/git is a stub that pops up the Xcode CLT dialog and
+    # fails — command -v git finds it, but it doesn't actually work without CLT.
+    # Check xcode-select first on Darwin; on Linux a plain git --version is enough.
+    if [ "$(uname -s)" = "Darwin" ]; then
+        xcode-select -p >/dev/null 2>&1 && git --version >/dev/null 2>&1
+    else
+        git --version >/dev/null 2>&1
+    fi
+}
+
 fetch_repo() {
     if [ -d "$INSTALL_DIR/.git" ]; then
         echo "✓ git checkout already at $INSTALL_DIR — pulling latest…"
         git -C "$INSTALL_DIR" pull --ff-only && return 0
     fi
 
-    if command -v git >/dev/null 2>&1; then
+    if git_works; then
         echo "Cloning with git (ref: $REPO_REF)…"
         git clone --branch "$REPO_REF" "$REPO_URL" "$INSTALL_DIR"
     else
-        # No git → download a tarball with curl (built into macOS; no Xcode CLT).
-        echo "git not found — downloading a tarball with curl (no Xcode CLT needed)…"
+        # No working git (macOS stub or missing binary) → tarball via curl.
+        echo "git not available — downloading tarball with curl (no Xcode CLT needed)…"
         local url="https://github.com/${REPO_SLUG}/archive/refs/heads/${REPO_REF}.tar.gz"
         if [ -e "$INSTALL_DIR" ] && [ -n "$(ls -A "$INSTALL_DIR" 2>/dev/null)" ]; then
             echo "Note: $INSTALL_DIR exists and is not empty; extracting into it."
