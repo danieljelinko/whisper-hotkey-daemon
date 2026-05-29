@@ -33,30 +33,27 @@ if [ "$OS" = "Darwin" ]; then
     echo "── macOS dependencies ──"
 
     # The default mlx-whisper backend needs NO Xcode CLT and NO Homebrew at
-    # install or run time — uv installs everything as prebuilt wheels.
+    # install or run time. Pixi provides a standalone Python environment without
+    # touching macOS developer-tool stubs such as python3 or install_name_tool.
     # (Xcode CLT / Homebrew are only needed for the optional whisper.cpp fallback
     # via scripts/101_install_whispercpp.sh, which checks for them itself.)
 
-    # uv
-    if ! command -v uv >/dev/null 2>&1; then
-        echo "Installing uv…"
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        # Source the env file uv's installer creates, or add common paths
+    # pixi
+    if ! command -v pixi >/dev/null 2>&1; then
+        echo "Installing pixi…"
+        curl -fsSL https://pixi.sh/install.sh | sh
         # shellcheck source=/dev/null
-        [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env" || \
-            export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+        [ -f "$HOME/.pixi/env" ] && source "$HOME/.pixi/env" || \
+            export PATH="$HOME/.pixi/bin:$PATH"
     else
-        echo "✓ uv: $(uv --version)"
+        echo "✓ pixi: $(pixi --version)"
     fi
 
     # Python deps — mlx-whisper installs as prebuilt wheels (no compiler).
     # The Whisper model itself downloads lazily from HuggingFace on first run.
     echo ""
     echo "── Python dependencies (incl. mlx-whisper) ──"
-    # Avoid macOS' /usr/bin/python3 developer-tools stub. uv's managed Python is
-    # a small standalone download and does not require Xcode Command Line Tools.
-    uv python install 3.12
-    UV_PYTHON_PREFERENCE=only-managed uv sync --python 3.12
+    pixi install
 
     echo ""
     echo "✓ macOS installation complete."

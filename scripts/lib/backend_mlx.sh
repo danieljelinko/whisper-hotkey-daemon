@@ -18,7 +18,7 @@ ensure_mlx_backend() {
     echo "Starting mlx-whisper server (model: ${WHISPER_MLX_MODEL:-mlx-community/whisper-large-v3-turbo})…"
     echo "  (first run downloads the model from HuggingFace — may take a few minutes)"
     WHISPER_MLX_HOST="$MLX_HOST" WHISPER_MLX_PORT="$MLX_PORT" \
-        uv run "$SCRIPT_DIR/src/mlx_whisper_server.py" >"$MLX_DIR/mlx_server.log" 2>&1 &
+        pixi run python "$SCRIPT_DIR/src/mlx_whisper_server.py" >"$MLX_DIR/mlx_server.log" 2>&1 &
     MLX_PID=$!
     trap '[ -n "$MLX_PID" ] && kill "$MLX_PID" 2>/dev/null' EXIT
 

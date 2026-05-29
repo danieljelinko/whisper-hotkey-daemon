@@ -5,7 +5,7 @@
 #
 # What it checks:
 #   1. Apple Silicon chip (M-series) + macOS version
-#   2. uv installed and Python deps synced
+#   2. Pixi installed and Python deps synced
 #   3. mlx_whisper + flask import
 #   4. End-to-end: start the mlx server, POST a real WAV → text
 #      (downloads the model from HuggingFace on first run — can take minutes)
@@ -42,22 +42,21 @@ else
 fi
 ok "macOS version: $(sw_vers -productVersion 2>/dev/null || echo unknown)"
 
-# ─── 2. uv + Python deps ──────────────────────────────────────────────────────
+# ─── 2. Pixi + Python deps ────────────────────────────────────────────────────
 hr; echo "2. Python environment"
-if command -v uv >/dev/null 2>&1; then
-    ok "uv: $(uv --version)"
-    uv python install 3.12 >/dev/null
-    UV_PYTHON_PREFERENCE=only-managed uv sync --python 3.12 --quiet 2>/dev/null && ok "uv sync OK" || fail "uv sync failed"
+if command -v pixi >/dev/null 2>&1; then
+    ok "pixi: $(pixi --version)"
+    pixi install --quiet 2>/dev/null && ok "pixi install OK" || fail "pixi install failed"
 else
-    fail "uv not installed. Run: ./install.sh"
+    fail "pixi not installed. Run: ./install.sh"
 fi
 
 # ─── 3. Imports ───────────────────────────────────────────────────────────────
 hr; echo "3. Key imports"
-uv run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
-uv run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
+pixi run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
+pixi run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
     fail "mlx_whisper missing — is this Apple Silicon? Run: ./install.sh"
-uv run python -c "import pynput, pyperclip, requests, sounddevice, pyautogui" 2>/dev/null && \
+pixi run python -c "import pynput, pyperclip, requests, sounddevice, pyautogui" 2>/dev/null && \
     ok "daemon deps import (pynput, pyperclip, requests, sounddevice, pyautogui)" || \
     fail "a daemon dependency failed to import"
 
@@ -72,7 +71,7 @@ if [ ! -f "$FIXTURE" ]; then
     warn "Skipping (fixture not found: $FIXTURE)"
 else
     LOG="$(mktemp)"
-    WHISPER_MLX_PORT="$PORT" uv run src/mlx_whisper_server.py >"$LOG" 2>&1 &
+    WHISPER_MLX_PORT="$PORT" pixi run python src/mlx_whisper_server.py >"$LOG" 2>&1 &
     SERVER_PID=$!
 
     echo -n "   Waiting for server (incl. possible model download)"
@@ -91,7 +90,7 @@ else
         RESPONSE="$(curl -sf -F "file=@$FIXTURE;type=audio/wav" \
             "http://127.0.0.1:$PORT/v1/audio/transcriptions" 2>/dev/null || echo "")"
         if echo "$RESPONSE" | grep -q '"text"'; then
-            TEXT="$(echo "$RESPONSE" | uv run python -c \
+            TEXT="$(echo "$RESPONSE" | pixi run python -c \
                 'import sys,json; print(json.load(sys.stdin).get("text",""))' 2>/dev/null || echo "")"
             ok "Transcription response received"
             echo "      Transcript: \"$TEXT\""

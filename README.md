@@ -14,9 +14,9 @@ Paste this into Terminal (macOS or Linux) — it handles everything from scratch
 curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
 ```
 
-Installs uv, downloads the repo to `~/Developer/whisper-hotkey-daemon` on macOS,
-and runs the full installer. The default macOS path uses mlx-whisper wheels, so
-it does not require Xcode CLT, Homebrew, or git. Re-running is safe.
+Installs Pixi, downloads the repo to `~/Developer/whisper-hotkey-daemon` on
+macOS, and runs the full installer. The default macOS path uses mlx-whisper
+wheels, so it does not require Xcode CLT, Homebrew, or git. Re-running is safe.
 
 macOS only: after install, grant **Microphone** and **Accessibility** permissions
 in System Settings → Privacy & Security before running `./run.sh`.
@@ -38,7 +38,7 @@ the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daem
 
 **macOS** — no Homebrew or compiler needed; the model downloads on first use:
 ```bash
-./install.sh   # installs uv + Python wheels incl. mlx-whisper
+./install.sh   # installs Pixi + Python wheels incl. mlx-whisper
 ./run.sh       # auto-detects macOS → mlx backend
 ```
 Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then

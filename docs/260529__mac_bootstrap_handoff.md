@@ -12,7 +12,7 @@ is transcribed locally and pasted into the active window. The repo lives at:
 Active branch: `feat/multi-platform-backends`
 
 The Mac backend is **mlx-whisper** (Apple-Silicon native, installs as Python
-wheels via uv, no Homebrew, no compiler). The Whisper model (~1.5 GB) downloads
+wheels in a Pixi environment, no Homebrew, no compiler). The Whisper model (~1.5 GB) downloads
 from HuggingFace on first transcription. The entry point is `./run.sh`.
 
 ---

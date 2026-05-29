@@ -11,7 +11,7 @@ set -euo pipefail
 #   Linux, no GPU       → whisper.cpp CPU
 #
 # Overrides:
-#   WHISPER_BACKEND=docker_cuda|whispercpp_cpu|whispercpp_metal  (skip detection)
+#   WHISPER_BACKEND=docker_cuda|whispercpp_cpu|whispercpp_metal|mlx  (skip detection)
 #   WHISPER_LANG=fr    language hint passed through to the daemon
 #
 # Dry-run:
@@ -23,23 +23,37 @@ cd "$SCRIPT_DIR"
 PRINT_ONLY=0
 for arg in "$@"; do [ "$arg" = "--print-backend" ] && PRINT_ONLY=1; done
 
+OS="$(uname -s)"
+
 # ─── Check common dependencies ────────────────────────────────────────────────
 
 if [ "$PRINT_ONLY" = "0" ]; then
-    command -v uv >/dev/null || {
-        echo "Error: uv is not installed (curl -LsSf https://astral.sh/uv/install.sh | sh)"
-        exit 1
-    }
-    command -v sox >/dev/null || { echo "Error: sox not installed (sudo apt install sox)"; exit 1; }
+    if [ "$OS" = "Darwin" ]; then
+        command -v pixi >/dev/null || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
+    else
+        command -v uv >/dev/null || {
+            echo "Error: uv is not installed (curl -LsSf https://astral.sh/uv/install.sh | sh)"
+            exit 1
+        }
+        command -v sox >/dev/null || { echo "Error: sox not installed (sudo apt install sox)"; exit 1; }
+    fi
 fi
 
 # ─── Detect platform + GPU ────────────────────────────────────────────────────
 
-OS="$(uname -s)"
 HAS_GPU_FLAG=""
 if [ "$OS" = "Linux" ] && command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
     HAS_GPU_FLAG="--has-nvidia-gpu"
 fi
+
+run_python() {
+    if [ "$OS" = "Darwin" ]; then
+        command -v pixi >/dev/null || { echo "Error: pixi is not installed (run ./install.sh)"; exit 1; }
+        pixi run python "$@"
+    else
+        uv run python "$@"
+    fi
+}
 
 # ─── Select backend via backend_select.py ────────────────────────────────────
 
@@ -47,7 +61,7 @@ OVERRIDE_FLAG=""
 [ -n "${WHISPER_BACKEND:-}" ] && OVERRIDE_FLAG="--override $WHISPER_BACKEND"
 
 # shellcheck disable=SC2086
-BACKEND="$(uv run python "$SCRIPT_DIR/src/backend_select.py" \
+BACKEND="$(run_python "$SCRIPT_DIR/src/backend_select.py" \
     --system "$OS" $HAS_GPU_FLAG $OVERRIDE_FLAG)"
 
 if [ "$PRINT_ONLY" = "1" ]; then echo "$BACKEND"; exit 0; fi
@@ -90,6 +104,6 @@ echo "Hold Ctrl+Alt+Space to record; release Ctrl to transcribe and paste."
 echo ""
 
 case "$OS" in
-Darwin) exec uv run src/whisper_hotkey_mac_experimental.py ;;
+Darwin) exec pixi run python src/whisper_hotkey_mac_experimental.py ;;
 *)      exec uv run src/whisper_hotkey_linux.py ;;
 esac

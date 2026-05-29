@@ -30,8 +30,8 @@ That's it. The bootstrap script handles everything in order:
 |---|---|
 | Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
 | Fetch | Uses `git clone` if git exists, otherwise downloads a tarball with `curl` — **no Xcode CLT required** |
-| uv | Installed via its standalone installer (no compiler needed) |
-| Python deps | `uv sync` installs everything as prebuilt wheels, **including mlx-whisper** |
+| Pixi | Installed via its standalone installer (no compiler needed) |
+| Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper** |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
@@ -39,10 +39,11 @@ That's it. The bootstrap script handles everything in order:
 > ```
 
 **No Xcode Command Line Tools, no Homebrew, no compiling.** The repo comes as a
-`curl` tarball (curl is built into macOS) and mlx-whisper installs as wheels. The
-only large download is the **Whisper model (~1.5 GB), fetched automatically from
-HuggingFace the first time you transcribe** — so your *first* dictation has a
-one-time delay, everything after is instant.
+`curl` tarball (curl is built into macOS) and Pixi provides Python without
+touching macOS developer-tool stubs such as `python3` or `install_name_tool`.
+The only large download is the **Whisper model (~1.5 GB), fetched automatically
+from HuggingFace the first time you transcribe** — so your *first* dictation has
+a one-time delay, everything after is instant.
 
 > **Developers:** if you want a real git checkout (to pull/commit, e.g. continuing
 > in Claude Code), install git first with `xcode-select --install` — the bootstrap
@@ -83,7 +84,7 @@ This script checks every component:
 | Check | What it verifies |
 |---|---|
 | Hardware | Apple Silicon chip detected |
-| Python | `uv sync` succeeds; `mlx_whisper` and `flask` import |
+| Python | `pixi install` succeeds; `mlx_whisper` and `flask` import |
 | **End-to-end** | Starts the mlx server, POSTs a real WAV, asserts text comes back (downloads the model on first run) |
 | Dispatch | `run.sh --print-backend` returns `mlx` |
 | Permissions | Prints reminder (cannot test programmatically) |
@@ -138,7 +139,7 @@ runs are instant. To pre-download, just run `./scripts/test_mac_setup.sh` once.
   then `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 
 ### `mlx_whisper` import fails
-You're almost certainly not on Apple Silicon, or `uv sync` didn't run. mlx is
+You're almost certainly not on Apple Silicon, or `pixi install` didn't run. mlx is
 Apple-Silicon-only. Re-run `./install.sh` on an M-series Mac.
 
 ---
@@ -151,11 +152,11 @@ If you prefer to run steps yourself instead of the bootstrap one-liner:
 # 1. Install Xcode Command Line Tools (opens a dialog — click Install). Gives you git.
 xcode-select --install
 
-# 2. Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source ~/.local/bin/env   # or restart Terminal
+# 2. Install Pixi
+curl -fsSL https://pixi.sh/install.sh | sh
+source ~/.pixi/env   # or restart Terminal
 
-# 3. Clone and install (uv sync pulls mlx-whisper as wheels — no compiler, no brew)
+# 3. Clone and install (Pixi pulls Python and mlx-whisper wheels — no compiler, no brew)
 git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git
 cd whisper-hotkey-daemon
 ./install.sh

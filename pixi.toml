@@ -1,0 +1,21 @@
+[workspace]
+name = "whisper-hotkey-daemon"
+version = "0.1.0"
+description = "Local whisper hotkey daemon for macOS and Linux"
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[dependencies]
+python = "3.12.*"
+pip = "*"
+
+[pypi-dependencies]
+pynput = "*"
+pyperclip = "*"
+requests = "*"
+sounddevice = "*"
+soundfile = "*"
+numpy = "*"
+pyautogui = "*"
+flask = ">=3.1.3"
+mlx-whisper = "*"
