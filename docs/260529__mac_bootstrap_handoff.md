@@ -117,6 +117,7 @@ tests/
   test_mlx_server.py            contract test (mocks mlx boundary; runs anywhere)
   test_backend_select.py        unit tests for dispatch logic
   test_run_dispatch.sh          shell dispatch smoke tests
+  test_install_uninstall.sh     fake-mac install + temp-HOME uninstall tests
 docs/
   mac_setup.md                  full Mac setup guide
 01_plan.md                      what's done / what's next
@@ -126,8 +127,9 @@ docs/
 
 **Running tests (Linux-safe, all green as of this handoff):**
 ```bash
-uv run pytest -q            # 11 tests
-bash tests/test_run_dispatch.sh  # 6 tests
+uv run pytest -q                    # 11 Python tests
+bash tests/test_run_dispatch.sh      # 6 shell assertions
+bash tests/test_install_uninstall.sh # 12 shell assertions
 ```
 
 ---

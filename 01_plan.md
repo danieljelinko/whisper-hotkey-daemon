@@ -35,7 +35,7 @@ mocked, and the real inference is verified on-device.
 ## Phase 2 — mlx-whisper Mac backend
 - [x] 2.0 `mlx_whisper_server.py` (Flask, lazy mlx import) + `test_mlx_server.py` (mocked boundary)
 - [x] 2.1 `lib/backend_mlx.sh` + `run.sh` mlx case; `backend_select` Darwin→`mlx`
-- [x] 2.2 installer/bootstrap drop Homebrew on Mac (uv wheels only); `scripts/test_mac_setup.sh` for mlx
+- [x] 2.2 installer/bootstrap drop Homebrew on Mac (Pixi wheels/env only); `scripts/test_mac_setup.sh` for mlx
 - [x] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
 - [ ] 2.4 **on-device:** manual hotkey→paste check; grant Mic + Accessibility; tune model/RAM on 8 GB
 - [x] 2.5 tarball-based bootstrap (curl fallback when git absent) → zero Xcode CLT for end users

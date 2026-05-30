@@ -261,6 +261,7 @@ code, read:
 uv run pytest            # 11 tests — backend_select unit + mlx-server contract
                          # (mlx-server test mocks the mlx boundary, so it runs anywhere)
 bash tests/test_run_dispatch.sh   # 6 shell dispatch tests
+bash tests/test_install_uninstall.sh  # 12 fake-mac install/uninstall assertions
 ```
 
 **TDD convention:** write the failing test first, then the minimum code to pass
