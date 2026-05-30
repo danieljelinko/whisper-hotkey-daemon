@@ -141,6 +141,43 @@ tail -f ~/Library/Logs/Whisper\ Hotkey/daemon.log   # app wrapper log
 
 ---
 
+## Uninstall
+
+From the install directory:
+
+```bash
+cd ~/Developer/whisper-hotkey-daemon   # or wherever you installed it
+./uninstall.sh
+```
+
+The uninstaller removes:
+
+| Item | Default |
+|---|---|
+| `~/Applications/Whisper Hotkey.app` | removed |
+| app logs/state under `~/Library` | removed |
+| known mlx-whisper HuggingFace model cache | removed |
+| install directory/repo | asks before removing |
+| `~/.pixi` | kept, unless you pass `--remove-pixi` |
+
+Fully unattended removal:
+
+```bash
+cd ~/Developer/whisper-hotkey-daemon
+./uninstall.sh --yes
+```
+
+Keep downloaded models:
+
+```bash
+./uninstall.sh --keep-models
+```
+
+The script intentionally does not wipe the whole HuggingFace cache or Pixi by
+default because those folders may be shared with other local ML projects.
+
+---
+
 ## Troubleshooting
 
 ### Hotkey doesn't respond

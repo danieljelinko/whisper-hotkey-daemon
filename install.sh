@@ -74,6 +74,7 @@ if [ "$OS" = "Darwin" ]; then
     echo "Verify setup:  ./scripts/test_mac_setup.sh"
     echo "Run daemon:    ./run.sh"
     echo "Launch app:    open ~/Applications/Whisper\\ Hotkey.app"
+    echo "Uninstall:     ./uninstall.sh"
 
 # ─── Linux ────────────────────────────────────────────────────────────────────
 elif [ "$OS" = "Linux" ]; then
@@ -136,6 +137,7 @@ elif [ "$OS" = "Linux" ]; then
     echo ""
     echo "✓ Linux installation complete."
     echo "Run:  ./run.sh"
+    echo "Uninstall: ./uninstall.sh"
 
 else
     echo "Error: unsupported OS '$OS'. Supported: Darwin, Linux."

@@ -3,6 +3,8 @@
 ## In flight
 - Phase 4.4: manual GUI test — double-click **Whisper Hotkey.app**, grant
   Microphone + Accessibility, confirm hotkey→paste in a real text field.
+- Product rename planning: user-facing app/repo target is `tigris-whisper`, but
+  bootstrap URL changes must wait until the GitHub repo is renamed.
 
 ## Next
 - On the Air: install generated app → double-click → grant Mic + Accessibility
@@ -15,6 +17,7 @@
 ## Done
 | Date | Task | Verified by |
 |---|---|---|
+| 2026-05-30 | Phase 4.5: uninstall script added | `bash -n uninstall.sh`; script removes app wrapper, logs/state, known mlx model cache, and optionally install dir / Pixi |
 | 2026-05-30 | Phase 4.1–4.3: generated `Whisper Hotkey.app` wrapper | SSH to M1 Air: clean install from GitHub `main`; app bundle `Info.plist` lint OK; `open ~/Applications/Whisper\ Hotkey.app` starts daemon and logs under `~/Library/Logs/Whisper Hotkey/daemon.log` |
 | 2026-05-30 | Clean Mac tarball install + mlx q4 smoke test green | SSH to M1 Air: clean install from GitHub `main`; `scripts/test_mac_setup.sh` → 10 passed / 0 failed; transcript fixture recognized |
 | 2026-05-30 | Mac install path switched to Pixi + ffmpeg | SSH clean install: Pixi env created without Xcode CLT/Homebrew; `ffmpeg` available; mlx-whisper transcribes |

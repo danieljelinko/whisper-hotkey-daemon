@@ -33,6 +33,8 @@ an M1 Air:
 - installer creates `~/Applications/Whisper Hotkey.app`
 - launching the app with `open ~/Applications/Whisper\ Hotkey.app` starts the
   daemon and writes logs to `~/Library/Logs/Whisper Hotkey/daemon.log`
+- `./uninstall.sh` removes the app wrapper, logs/state, known project model
+  cache, and optionally the install directory / Pixi
 
 The remaining on-device work is the GUI-only path: double-click the app, grant
 Microphone + Accessibility to **Whisper Hotkey**, then confirm hotkey-to-paste in
@@ -143,6 +145,9 @@ From `01_plan.md`:
 better tradeoff. Record any later model changes in `03_decisions.md`.
 
 Phase 3 (Windows, Parakeet, Voxtral) is future work, not committed.
+
+Phase 4.6 is the planned product rename to `tigris-whisper`. Do not change the
+bootstrap repo slug until the GitHub repository has actually been renamed.
 
 ---
 

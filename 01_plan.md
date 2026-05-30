@@ -4,6 +4,11 @@
 feature on Linux (NVIDIA & no-GPU) and Mac (M1), by swapping the transcription backend behind the
 existing `WHISPER_API` HTTP contract. The daemon is already backend-agnostic, so no client rewrite.
 
+**User-facing objective.** Install, launch, permission grants, smoke tests, and
+uninstall should feel like a normal local Mac utility: a named app, clear logs,
+clear cache ownership, and a documented cleanup path for generated files and
+downloaded models.
+
 **Dispatch.**
 ```
 Darwin              → mlx-whisper (wheels)           (Mac-only verify; whispercpp_metal = fallback)
@@ -47,4 +52,6 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [x] 4.2 App launch runs the existing `run.sh` with logs and duplicate-run guard
 - [x] 4.3 Permissions attach to `Whisper Hotkey.app` where macOS allows it; docs explain Mic + Accessibility
 - [ ] 4.4 On-device: double-click app, grant permissions, confirm manual hotkey→paste
-- [ ] 4.5 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
+- [x] 4.5 Add uninstall path for app wrapper, logs/state, install dir, and downloaded model cache
+- [ ] 4.6 Rename user-facing product/repo to `tigris-whisper` after GitHub repo rename is coordinated
+- [ ] 4.7 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG

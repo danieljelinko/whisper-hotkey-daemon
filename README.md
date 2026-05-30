@@ -22,6 +22,16 @@ macOS only: after install, launch `~/Applications/Whisper Hotkey.app` and grant
 **Microphone** and **Accessibility** permissions to **Whisper Hotkey** in System
 Settings → Privacy & Security.
 
+Uninstall from the install directory:
+
+```bash
+./uninstall.sh
+```
+
+This removes the generated app, logs/state, and known downloaded mlx-whisper
+model cache; it asks before removing the install directory. Use
+`./uninstall.sh --yes` for unattended removal.
+
 For a more detailed walkthrough see [`docs/mac_setup.md`](docs/mac_setup.md).
 
 ---
