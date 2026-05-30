@@ -168,6 +168,7 @@ if [ "$OS" = "Darwin" ]; then
     echo ""
     echo "Notes:"
     echo "   • The app is the normal user path and runs the daemon in the background."
+    echo "   • To check/stop/restart/logs: cd $INSTALL_DIR && ./scripts/control_mac_app.sh status|stop|restart|logs"
     echo "   • Manual/developer mode is: cd $INSTALL_DIR && ./run.sh"
     echo "   • If you use manual mode, grant permissions to your terminal app instead."
     echo "   • To uninstall later: cd $INSTALL_DIR && ./uninstall.sh"

@@ -63,6 +63,7 @@ LOG_DIR="$HOME/Library/Logs/tigris-whisper"
 STATE_DIR="$HOME/Library/Application Support/tigris-whisper"
 LOG_FILE="$LOG_DIR/daemon.log"
 PID_FILE="$STATE_DIR/daemon.pid"
+RUN_PID_FILE="$STATE_DIR/run.pid"
 
 mkdir -p "$LOG_DIR" "$STATE_DIR"
 
@@ -80,8 +81,15 @@ if [ -f "$PID_FILE" ]; then
 fi
 
 echo "$$" > "$PID_FILE"
-cleanup() { rm -f "$PID_FILE"; }
-trap cleanup EXIT
+RUN_PID=""
+cleanup() {
+    if [ -n "${RUN_PID:-}" ] && kill -0 "$RUN_PID" 2>/dev/null; then
+        kill "$RUN_PID" 2>/dev/null || true
+        wait "$RUN_PID" 2>/dev/null || true
+    fi
+    rm -f "$PID_FILE" "$RUN_PID_FILE"
+}
+trap cleanup EXIT TERM INT
 
 export PATH="$HOME/.pixi/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
@@ -92,7 +100,10 @@ STATUS=0
     echo "Repo: $REPO_DIR"
     cd "$REPO_DIR"
     set +e
-    ./run.sh
+    ./run.sh &
+    RUN_PID=$!
+    echo "$RUN_PID" > "$RUN_PID_FILE"
+    wait "$RUN_PID"
     STATUS=$?
     set -e
     echo "===== $(date) tigris-whisper exited with status $STATUS ====="

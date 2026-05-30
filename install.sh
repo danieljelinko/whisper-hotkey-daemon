@@ -75,6 +75,7 @@ if [ "$OS" = "Darwin" ]; then
     echo ""
     echo "Normal launch:     open ~/Applications/tigris-whisper.app"
     echo "Manual/dev launch: ./run.sh"
+    echo "App controls:      ./scripts/control_mac_app.sh status|stop|restart|logs"
     echo "Verify/warm model: ./scripts/test_mac_setup.sh"
     echo "Uninstall:     ./uninstall.sh"
 

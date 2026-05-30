@@ -56,4 +56,5 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [x] 4.6 Rename user-facing product/repo to `tigris-whisper` after GitHub repo rename is coordinated
 - [x] 4.7 Bootstrap automatically runs Mac smoke test/model warmup and makes app launch the normal user path
 - [x] 4.8 Mac daemon requests Microphone permission at app startup so it appears in Privacy settings
-- [ ] 4.9 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
+- [x] 4.9 Add status/stop/restart/log controls for the background Mac app
+- [ ] 4.10 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG

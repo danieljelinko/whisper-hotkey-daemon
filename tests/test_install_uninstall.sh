@@ -74,6 +74,10 @@ grep -q "Starting in the background" "$APP_DIR/Contents/MacOS/tigris-whisper" &&
     ok "app wrapper notifies on background start" || \
     fail "app wrapper notifies on background start"
 
+grep -q "RUN_PID_FILE" "$APP_DIR/Contents/MacOS/tigris-whisper" && \
+    ok "app wrapper tracks daemon child process" || \
+    fail "app wrapper tracks daemon child process"
+
 grep -q "Uninstall:     ./uninstall.sh" "$install_out" && \
     ok "install.sh prints uninstall command" || \
     fail "install.sh prints uninstall command"
@@ -81,6 +85,22 @@ grep -q "Uninstall:     ./uninstall.sh" "$install_out" && \
 grep -q "Normal launch:     open ~/Applications/tigris-whisper.app" "$install_out" && \
     ok "install.sh makes app launch the normal path" || \
     fail "install.sh makes app launch the normal path"
+
+grep -q "control_mac_app.sh status|stop|restart|logs" "$install_out" && \
+    ok "install.sh prints app control commands" || \
+    fail "install.sh prints app control commands"
+
+control_out="$TMP/control.out"
+if bash "$SCRIPT_DIR/scripts/control_mac_app.sh" help >"$control_out" 2>&1; then
+    ok "control_mac_app.sh help exits successfully"
+else
+    cat "$control_out"
+    fail "control_mac_app.sh help exits successfully"
+fi
+
+grep -q "status" "$control_out" && grep -q "restart" "$control_out" && \
+    ok "control_mac_app.sh documents status/restart" || \
+    fail "control_mac_app.sh documents status/restart"
 
 # ─── bootstrap.sh: runs Mac smoke test/model warmup after install ─────────────
 
@@ -139,6 +159,10 @@ fi
 grep -q "asks for Microphone access at startup" "$bootstrap_out" && \
     ok "bootstrap.sh says app requests Microphone at startup" || \
     fail "bootstrap.sh says app requests Microphone at startup"
+
+grep -q "control_mac_app.sh status|stop|restart|logs" "$bootstrap_out" && \
+    ok "bootstrap.sh prints app control commands" || \
+    fail "bootstrap.sh prints app control commands"
 
 grep -q "4. Confirm Microphone is enabled:" "$bootstrap_out" && \
     ok "bootstrap.sh gives explicit Microphone permission step" || \

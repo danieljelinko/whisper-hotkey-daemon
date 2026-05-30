@@ -86,6 +86,15 @@ notification. If nothing appears, check the log:
 tail -80 ~/Library/Logs/tigris-whisper/daemon.log
 ```
 
+Control the background app from the install directory:
+
+```bash
+./scripts/control_mac_app.sh status
+./scripts/control_mac_app.sh stop
+./scripts/control_mac_app.sh restart
+./scripts/control_mac_app.sh logs
+```
+
 `./run.sh` is the manual/developer path from inside the repo. If you use that
 instead, grant permissions to your terminal app, not `tigris-whisper`.
 

@@ -63,6 +63,15 @@ you use it, grant permissions to your terminal app instead.
 No app window opens; tigris-whisper runs in the background and writes logs to
 `~/Library/Logs/tigris-whisper/daemon.log`.
 
+Control the background app from the install directory:
+
+```bash
+./scripts/control_mac_app.sh status
+./scripts/control_mac_app.sh stop
+./scripts/control_mac_app.sh restart
+./scripts/control_mac_app.sh logs
+```
+
 Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then
 `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 
