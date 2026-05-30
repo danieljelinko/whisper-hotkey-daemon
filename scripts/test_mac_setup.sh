@@ -76,7 +76,8 @@ hr; echo "3. Key imports"
 
 # ─── 4. End-to-end: launch mlx server → transcribe fixture ───────────────────
 hr; echo "4. End-to-end transcription (mlx server + real audio)"
-echo "   NOTE: first run downloads the model (~1.5 GB) — this can take minutes."
+echo "   NOTE: first run downloads the Whisper model (~1.5 GB)."
+echo "   This can take several minutes. Progress lines below mean it is still working."
 SERVER_PID=""
 cleanup() { [ -n "$SERVER_PID" ] && kill "$SERVER_PID" 2>/dev/null || true; }
 trap cleanup EXIT
@@ -104,7 +105,8 @@ else
         RESPONSE_FILE="$(mktemp)"
         CURL_LOG="$(mktemp)"
         echo "   Sending sample audio for transcription..."
-        echo "   Progress: waiting for first response; model download/inference can take several minutes."
+        echo "   Progress: waiting for first response."
+        echo "   If the model is not cached yet, it is downloading now and can take several minutes."
         START_TS="$(date +%s)"
         curl -sf -F "file=@$FIXTURE;type=audio/wav" \
             "http://127.0.0.1:$PORT/v1/audio/transcriptions" \
@@ -165,6 +167,7 @@ echo ""
 if [ "$FAIL" -gt 0 ]; then
     echo "Fix the failures above, then re-run: ./scripts/test_mac_setup.sh"; exit 1
 else
-    echo "Ready. Start the daemon:  ./run.sh"
+    echo "Ready. Normal launch: open ~/Applications/tigris-whisper.app"
+    echo "Manual/dev launch from this repo: ./run.sh"
     echo "Hold Ctrl+Option+Space to record; release Ctrl to transcribe and paste."
 fi

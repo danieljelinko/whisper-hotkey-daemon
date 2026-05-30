@@ -33,6 +33,7 @@ That's it. The bootstrap script handles everything in order:
 | Pixi | Installed via its standalone installer (no compiler needed) |
 | Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper**, plus `ffmpeg` for audio loading |
 | App wrapper | Creates `~/Applications/tigris-whisper.app` so users can launch a named app instead of Terminal |
+| Model warmup | Runs `./scripts/test_mac_setup.sh`, which starts mlx-whisper and downloads the model on first use |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
@@ -43,8 +44,9 @@ That's it. The bootstrap script handles everything in order:
 `curl` tarball (curl is built into macOS) and Pixi provides Python without
 touching macOS developer-tool stubs such as `python3` or `install_name_tool`.
 The only large download is the **Whisper model (~1.5 GB), fetched automatically
-from HuggingFace the first time you transcribe** — so your *first* dictation has
-a one-time delay, everything after is instant.
+from HuggingFace during the bootstrap smoke test or the first time you
+transcribe**. This can take several minutes; the test prints progress while it
+works. After the model is cached, later runs are much faster.
 
 If the install directory already exists from an older tarball install, bootstrap
 moves it aside to `tigris-whisper.backup.<timestamp>` before extracting.
@@ -60,17 +62,22 @@ That keeps reinstall tests clean and avoids stale files from previous attempts.
 
 ## 2. Launch the app
 
-After install, you can either run the CLI or launch the app wrapper:
+After install, launch the app wrapper:
 
 ```bash
 open ~/Applications/tigris-whisper.app
 ```
 
-The app runs the same local daemon as `./run.sh` and writes logs to:
+This is the normal user path. The app runs the same local daemon as `./run.sh`,
+but gives macOS a named app for Microphone and Accessibility permissions. It
+writes logs to:
 
 ```bash
 ~/Library/Logs/tigris-whisper/daemon.log
 ```
+
+`./run.sh` is the manual/developer path from inside the repo. If you use that
+instead, grant permissions to your terminal app, not `tigris-whisper`.
 
 ## 3. Grant macOS permissions
 
@@ -93,14 +100,15 @@ settings manually.
 
 ---
 
-## 4. Verify with the smoke test
+## 4. Verify / Warm Model
 
 ```bash
 cd ~/Developer/tigris-whisper   # or wherever you chose to install
 ./scripts/test_mac_setup.sh
 ```
 
-This script checks every component:
+Bootstrap runs this automatically on macOS unless you set
+`TIGRIS_SKIP_SMOKE_TEST=1`. It checks every component and warms the model cache:
 
 | Check | What it verifies |
 |---|---|
@@ -110,8 +118,8 @@ This script checks every component:
 | Dispatch | `run.sh --print-backend` returns `mlx` |
 | Permissions | Prints reminder (cannot test programmatically) |
 
-All checks green? You're ready. (The first run downloads the model, so this
-test may take a few minutes the very first time.)
+All checks green? You're ready. The first run downloads the model (~1.5 GB), so
+this test may take several minutes the very first time.
 
 ---
 
@@ -124,7 +132,7 @@ open ~/Applications/tigris-whisper.app
 Or run from the repo:
 
 ```bash
-./run.sh                   # auto-detects Mac → mlx-whisper
+./run.sh                   # manual/dev mode: auto-detects Mac → mlx-whisper
 WHISPER_LANG=fr ./run.sh   # French
 WHISPER_LANG=hu ./run.sh   # Hungarian
 ```

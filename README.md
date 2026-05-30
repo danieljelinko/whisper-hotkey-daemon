@@ -15,12 +15,15 @@ curl -fsSL https://raw.githubusercontent.com/danieljelinko/tigris-whisper/main/b
 ```
 
 Installs Pixi, downloads the repo to `~/Developer/tigris-whisper` on
-macOS, and runs the full installer. The default macOS path uses mlx-whisper
-wheels, so it does not require Xcode CLT, Homebrew, or git. Re-running is safe.
+macOS, runs the full installer, then runs the Mac smoke test to warm the model
+cache. The default macOS path uses mlx-whisper wheels, so it does not require
+Xcode CLT, Homebrew, or git. Re-running is safe.
 
-macOS only: after install, launch `~/Applications/tigris-whisper.app` and grant
-**Microphone** and **Accessibility** permissions to **tigris-whisper** in System
-Settings → Privacy & Security.
+macOS only: the first smoke test/transcription downloads the Whisper model
+(~1.5 GB), which can take several minutes. After install, launch
+`~/Applications/tigris-whisper.app` and grant **Microphone** and
+**Accessibility** permissions to **tigris-whisper** in System Settings →
+Privacy & Security.
 
 Uninstall from the install directory:
 
@@ -52,8 +55,10 @@ the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daem
 ./install.sh   # installs Pixi + Python wheels incl. mlx-whisper
 open ~/Applications/tigris-whisper.app
 ```
-The generated app wrapper runs the same daemon as `./run.sh`, but gives macOS a
-named app for Microphone and Accessibility permissions.
+The generated app wrapper is the normal user path. It runs the same daemon as
+`./run.sh`, but gives macOS a named app for Microphone and Accessibility
+permissions. `./run.sh` is the manual/developer path from inside the repo; if
+you use it, grant permissions to your terminal app instead.
 
 Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then
 `WHISPER_BACKEND=whispercpp_metal ./run.sh`.

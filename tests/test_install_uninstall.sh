@@ -35,6 +35,16 @@ esac
 EOF
 chmod +x "$FAKE_BIN/pixi"
 
+cat > "$FAKE_BIN/git" <<'EOF'
+#!/usr/bin/env bash
+case "${1:-}" in
+    -C) exit 0 ;;
+    --version) echo "git version 0.test" ;;
+    *) exit 0 ;;
+esac
+EOF
+chmod +x "$FAKE_BIN/git"
+
 export PATH="$FAKE_BIN:$PATH"
 export HOME="$HOME_DIR"
 export WHISPER_APP_PARENT="$APP_PARENT"
@@ -63,6 +73,46 @@ grep -q "com.danieljelinko.tigris-whisper" "$APP_DIR/Contents/Info.plist" && \
 grep -q "Uninstall:     ./uninstall.sh" "$install_out" && \
     ok "install.sh prints uninstall command" || \
     fail "install.sh prints uninstall command"
+
+grep -q "Normal launch:     open ~/Applications/tigris-whisper.app" "$install_out" && \
+    ok "install.sh makes app launch the normal path" || \
+    fail "install.sh makes app launch the normal path"
+
+# ─── bootstrap.sh: runs Mac smoke test/model warmup after install ─────────────
+
+BOOTSTRAP_DIR="$TMP/bootstrap-install"
+mkdir -p "$BOOTSTRAP_DIR/.git" "$BOOTSTRAP_DIR/scripts"
+cat > "$BOOTSTRAP_DIR/install.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "stub install ran"
+EOF
+chmod +x "$BOOTSTRAP_DIR/install.sh"
+cat > "$BOOTSTRAP_DIR/scripts/test_mac_setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "stub smoke test ran"
+touch "$HOME/bootstrap-smoke-test-ran"
+EOF
+chmod +x "$BOOTSTRAP_DIR/scripts/test_mac_setup.sh"
+
+bootstrap_out="$TMP/bootstrap.out"
+if WHISPER_INSTALL_DIR="$BOOTSTRAP_DIR" bash "$SCRIPT_DIR/bootstrap.sh" >"$bootstrap_out" 2>&1; then
+    ok "bootstrap.sh fake-mac path exits successfully"
+else
+    cat "$bootstrap_out"
+    fail "bootstrap.sh fake-mac path exits successfully"
+fi
+
+grep -q "Running Mac setup test and model warmup" "$bootstrap_out" && \
+    ok "bootstrap.sh announces automatic smoke test/model warmup" || \
+    fail "bootstrap.sh announces automatic smoke test/model warmup"
+
+grep -q "can take several minutes" "$bootstrap_out" && \
+    ok "bootstrap.sh warns model download can take several minutes" || \
+    fail "bootstrap.sh warns model download can take several minutes"
+
+[ -f "$HOME/bootstrap-smoke-test-ran" ] && \
+    ok "bootstrap.sh runs smoke test automatically on macOS" || \
+    fail "bootstrap.sh runs smoke test automatically on macOS"
 
 # ─── uninstall.sh: removes generated app/state/logs/model/install dir safely ──
 

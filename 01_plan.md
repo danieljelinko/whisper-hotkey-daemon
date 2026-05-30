@@ -54,4 +54,5 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [ ] 4.4 On-device: double-click app, grant permissions, confirm manual hotkey→paste
 - [x] 4.5 Add tested uninstall path for app wrapper, logs/state, install dir, and downloaded model cache
 - [x] 4.6 Rename user-facing product/repo to `tigris-whisper` after GitHub repo rename is coordinated
-- [ ] 4.7 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
+- [x] 4.7 Bootstrap automatically runs Mac smoke test/model warmup and makes app launch the normal user path
+- [ ] 4.8 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG

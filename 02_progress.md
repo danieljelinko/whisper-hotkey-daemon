@@ -15,8 +15,9 @@
 ## Done
 | Date | Task | Verified by |
 |---|---|---|
+| 2026-05-30 | Phase 4.7: bootstrap runs smoke test/model warmup automatically | `tests/test_install_uninstall.sh` → 17 passed; covers fake-mac bootstrap invoking smoke test, warning that model download can take several minutes, and installer messaging that app launch is the normal path |
 | 2026-05-30 | Phase 4.6: renamed user-facing product/repo to `tigris-whisper` | GitHub repo renamed first; source now uses `danieljelinko/tigris-whisper`, `~/Developer/tigris-whisper`, `tigris-whisper.app`, `com.danieljelinko.tigris-whisper`; `tests/test_install_uninstall.sh` covers renamed app/install paths |
-| 2026-05-30 | Phase 4.5: uninstall script added with tests | `tests/test_install_uninstall.sh` → 12 passed; covers fake-mac install wrapper creation and temp-HOME uninstall of app/logs/state/model cache/install dir |
+| 2026-05-30 | Phase 4.5: uninstall script added with tests | `tests/test_install_uninstall.sh` covers fake-mac install wrapper creation and temp-HOME uninstall of app/logs/state/model cache/install dir |
 | 2026-05-30 | Phase 4.1–4.3: generated app wrapper | SSH to M1 Air verified the app-wrapper launch path before rename; current `tigris-whisper.app` bundle name, id, logs, and state paths are covered by `tests/test_install_uninstall.sh` |
 | 2026-05-30 | Clean Mac tarball install + mlx q4 smoke test green | SSH to M1 Air: clean install from GitHub `main`; `scripts/test_mac_setup.sh` → 10 passed / 0 failed; transcript fixture recognized |
 | 2026-05-30 | Mac install path switched to Pixi + ffmpeg | SSH clean install: Pixi env created without Xcode CLT/Homebrew; `ffmpeg` available; mlx-whisper transcribes |

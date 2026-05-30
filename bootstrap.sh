@@ -18,6 +18,7 @@
 # Env overrides:
 #   WHISPER_INSTALL_DIR=~/my-dir   skip the directory prompt
 #   WHISPER_REF=some-branch        which git ref to fetch
+#   TIGRIS_SKIP_SMOKE_TEST=1       skip automatic Mac smoke test/model warmup
 #
 # Re-running is safe — each step is skipped if already done.
 # Supported OS: macOS (Apple Silicon), Linux (Ubuntu/Debian/Fedora).
@@ -36,7 +37,7 @@ else                          DEFAULT_DIR="$HOME/tigris-whisper"; fi
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
-echo "║      tigris-whisper  bootstrap            ║"
+echo "║             Tigris Whisper bootstrap             ║"
 echo "║  Hold a key → speak → release → text is pasted   ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
@@ -123,12 +124,27 @@ if [ ! -f install.sh ]; then
 fi
 bash install.sh
 
+# ─── Warm up / smoke test ─────────────────────────────────────────────────────
+if [ "$OS" = "Darwin" ] && [ "${TIGRIS_SKIP_SMOKE_TEST:-0}" != "1" ]; then
+    echo ""
+    echo "Running Mac setup test and model warmup…"
+    echo "This starts the local mlx-whisper server and transcribes a sample audio file."
+    echo "If this is the first run, the Whisper model downloads now (~1.5 GB)."
+    echo "That can take several minutes; progress lines will print while it works."
+    echo ""
+    bash ./scripts/test_mac_setup.sh
+elif [ "$OS" = "Darwin" ]; then
+    echo ""
+    echo "Skipping Mac smoke test/model warmup because TIGRIS_SKIP_SMOKE_TEST=1."
+    echo "Run it later with: cd $INSTALL_DIR && ./scripts/test_mac_setup.sh"
+fi
+
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "═══════════════════════════════════════════"
 if [ "$OS" = "Darwin" ]; then
     echo ""
-    echo "  Before first run — grant two macOS permissions:"
+    echo "  Next: grant two macOS permissions to the app:"
     echo ""
     echo "  1. Microphone:"
     echo "     System Settings → Privacy & Security → Microphone"
@@ -138,18 +154,21 @@ if [ "$OS" = "Darwin" ]; then
     echo "     System Settings → Privacy & Security → Accessibility"
     echo "     ✦ enable tigris-whisper"
     echo ""
-    echo "  If you run ./run.sh manually instead of the app, enable your terminal app."
-    echo ""
-    echo "  Then verify everything works:"
-    echo "    cd $INSTALL_DIR && ./scripts/test_mac_setup.sh"
-    echo ""
-    echo "  Launch the app wrapper:"
+    echo "  Then launch the app:"
     echo "    open ~/Applications/tigris-whisper.app"
     echo ""
+    echo "  The app is the normal user path. It runs the daemon in the background"
+    echo "  and gives macOS a named app for permissions."
+    echo ""
+    echo "  Developer/manual mode:"
+    echo "    cd $INSTALL_DIR && ./run.sh"
+    echo "  If you use manual mode, grant permissions to your terminal app instead."
+    echo ""
+else
+    echo "  Start the daemon:"
+    echo "    cd $INSTALL_DIR && ./run.sh"
+    echo ""
 fi
-echo "  Start the daemon:"
-echo "    cd $INSTALL_DIR && ./run.sh"
-echo ""
 echo "  Uninstall:"
 echo "    cd $INSTALL_DIR && ./uninstall.sh"
 echo ""

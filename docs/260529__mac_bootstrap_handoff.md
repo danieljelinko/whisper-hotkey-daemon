@@ -32,6 +32,8 @@ install/uninstall tests until the next clean Mac run:
 - `ffmpeg` is provided by the Pixi environment
 - `scripts/test_mac_setup.sh` passes against real audio and real mlx-whisper
 - installer creates `~/Applications/tigris-whisper.app`
+- bootstrap runs `./scripts/test_mac_setup.sh` automatically on macOS to verify
+  setup and warm the model cache
 - the app launcher starts the daemon and writes logs to
   `~/Library/Logs/tigris-whisper/daemon.log` (same wrapper behavior was
   SSH-verified before rename; renamed paths are covered by tests)
@@ -83,7 +85,7 @@ cd ~/Developer/tigris-whisper
 ```
 
 This starts the mlx-whisper server, **downloads the Whisper model (~1.5 GB on
-first run** — wait for it), POSTs a real WAV, and asserts you get text back.
+first run** — this can take several minutes), POSTs a real WAV, and asserts you get text back.
 Checks all pass? The backend works.
 
 ### Step 3 — Manual hotkey test
@@ -103,7 +105,7 @@ tail -f ~/Library/Logs/tigris-whisper/daemon.log
 ## Repo orientation
 
 ```
-run.sh                          CLI entry point (auto-detects Mac → mlx)
+run.sh                          manual/dev CLI entry point (auto-detects Mac → mlx)
 install.sh                      one-stop installer (called by bootstrap.sh)
 bootstrap.sh                    curl-installable; tarball fallback for no-git Macs
 src/
@@ -131,7 +133,7 @@ docs/
 ```bash
 uv run pytest -q                    # 11 Python tests
 bash tests/test_run_dispatch.sh      # 6 shell assertions
-bash tests/test_install_uninstall.sh # 12 shell assertions
+bash tests/test_install_uninstall.sh # 17 shell assertions
 ```
 
 ---
