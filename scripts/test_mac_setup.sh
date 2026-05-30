@@ -6,7 +6,7 @@
 # What it checks:
 #   1. Apple Silicon chip (M-series) + macOS version
 #   2. Pixi installed and Python deps synced
-#   3. mlx_whisper + flask import
+#   3. Flask + daemon dependency imports
 #   4. End-to-end: start the mlx server, POST a real WAV → text
 #      (downloads the model from HuggingFace on first run — can take minutes)
 #   5. run.sh dispatch resolves to mlx
@@ -70,8 +70,6 @@ fi
 # ─── 3. Imports ───────────────────────────────────────────────────────────────
 hr; echo "3. Key imports"
 "$PIXI" run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
-"$PIXI" run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
-    fail "mlx_whisper missing — is this Apple Silicon? Run: ./install.sh"
 "$PIXI" run python -c "import pynput, requests, sounddevice" 2>/dev/null && \
     ok "daemon deps import (pynput, requests, sounddevice)" || \
     fail "a daemon dependency failed to import"

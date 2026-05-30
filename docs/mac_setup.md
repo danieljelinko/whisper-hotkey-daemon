@@ -105,7 +105,7 @@ This script checks every component:
 | Check | What it verifies |
 |---|---|
 | Hardware | Apple Silicon chip detected |
-| Python | `pixi install` succeeds; `mlx_whisper` and `flask` import |
+| Python | `pixi install` succeeds; Flask and daemon dependencies import |
 | **End-to-end** | Starts the mlx server, POSTs a real WAV, asserts text comes back (downloads the model on first run) |
 | Dispatch | `run.sh --print-backend` returns `mlx` |
 | Permissions | Prints reminder (cannot test programmatically) |
