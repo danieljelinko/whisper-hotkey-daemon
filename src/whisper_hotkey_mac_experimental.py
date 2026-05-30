@@ -6,14 +6,13 @@ The captured audio is sent to a Whisper server and the transcription is copied
 to the clipboard and pasted (⌘-V) into the front-most application.
 
 Prereqs (Python ≥ 3.10):
-    pip install sounddevice soundfile numpy pynput requests pyperclip pyautogui
+    pip install sounddevice numpy pynput requests
     # sounddevice wheels already bundle PortAudio on macOS; no Homebrew needed.
 """
 
 import os, pathlib, logging, time, tempfile, queue, wave, subprocess
-import requests, numpy as np, pyperclip, sounddevice as sd, soundfile as sf
+import requests, numpy as np, sounddevice as sd
 from pynput.keyboard import Key, Listener
-import pyautogui
 
 # ── Settings ──────────────────────────────────────────────────────────────
 API          = os.getenv("WHISPER_API",
@@ -43,6 +42,13 @@ def notify(title: str, body: str = "") -> None:
         subprocess.run(["osascript", "-e", osa], check=True)
     except Exception as e:
         log.debug("Notification failed: %s", e)
+
+def copy_to_clipboard(text: str) -> None:
+    subprocess.run(["pbcopy"], input=text, text=True, check=True)
+
+def paste_frontmost() -> None:
+    osa = 'tell application "System Events" to keystroke "v" using command down'
+    subprocess.run(["osascript", "-e", osa], check=True)
 
 # ── Recorder state ────────────────────────────────────────────────────────
 stream       = None                   # active sounddevice.InputStream
@@ -89,12 +95,12 @@ def stop_recording():
         log.error("Transcription failed: %s", e)
         return
 
-    # clipboard + paste
-    pyperclip.copy(text)
+    # clipboard + paste; System Events requires Accessibility permission.
     try:
-        pyautogui.hotkey("command", "v")      # requires Accessibility permission the first time
-    except Exception:
-        pass
+        copy_to_clipboard(text)
+        paste_frontmost()
+    except Exception as e:
+        log.warning("Paste failed; transcript remains available in logs: %s", e)
     notify("Done", text[:200] + ("…" if len(text) > 200 else ""))
 
 # ── Hot-key logic ─────────────────────────────────────────────────────────

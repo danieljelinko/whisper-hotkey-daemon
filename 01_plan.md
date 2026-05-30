@@ -41,3 +41,10 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [ ] 3.1 Windows support: `backend_select` "Windows" case + either WSL2 (run.sh as-is, Docker+CUDA works) or native `run.ps1`; win client paste = `ctrl+v`, notify via `win10toast`
 - [ ] 3.2 NVIDIA Parakeet-TDT-0.6B v3 backend (NeMo FastAPI wrapper) — fastest on this box, fits 8 GB VRAM easily
 - [ ] 3.3 Voxtral-Mini-4B backend via vLLM (OpenAI-compatible) — **needs a 4-bit quantized (AWQ/GPTQ) build to fit this box's 8 GB VRAM**; bf16 wants ≥16 GB
+
+## Phase 4 — Mac app wrapper / user-facing install
+- [ ] 4.1 Generate `Whisper Hotkey.app` during Mac install, without Xcode/CLT
+- [ ] 4.2 App launch runs the existing `run.sh` with logs and duplicate-run guard
+- [ ] 4.3 Permissions attach to `Whisper Hotkey.app` where macOS allows it; docs explain Mic + Accessibility
+- [ ] 4.4 On-device: double-click app, grant permissions, confirm manual hotkey→paste
+- [ ] 4.5 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG

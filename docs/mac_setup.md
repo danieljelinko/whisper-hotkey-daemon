@@ -32,6 +32,7 @@ That's it. The bootstrap script handles everything in order:
 | Fetch | Uses `git clone` if git exists, otherwise downloads a clean tarball with `curl` — **no Xcode CLT required** |
 | Pixi | Installed via its standalone installer (no compiler needed) |
 | Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper**, plus `ffmpeg` for audio loading |
+| App wrapper | Creates `~/Applications/Whisper Hotkey.app` so users can launch a named app instead of Terminal |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
@@ -57,18 +58,34 @@ That keeps reinstall tests clean and avoids stale files from previous attempts.
 
 ---
 
-## 2. Grant macOS permissions
+## 2. Launch the app
+
+After install, you can either run the CLI or launch the app wrapper:
+
+```bash
+open ~/Applications/Whisper\ Hotkey.app
+```
+
+The app runs the same local daemon as `./run.sh` and writes logs to:
+
+```bash
+~/Library/Logs/Whisper Hotkey/daemon.log
+```
+
+## 3. Grant macOS permissions
 
 **This step is required.** Without it, the daemon starts but recording and/or
-paste will silently fail.
+paste will silently fail. If you launch the app wrapper, grant permissions to
+**Whisper Hotkey**. If you run `./run.sh` manually, grant permissions to your
+terminal app.
 
 ### Microphone
 > System Settings → Privacy & Security → **Microphone**
-> Enable your terminal app (Terminal, iTerm2, Warp…)
+> Enable **Whisper Hotkey** (or your terminal app if running `./run.sh`)
 
 ### Accessibility (hotkey + paste)
 > System Settings → Privacy & Security → **Accessibility**
-> Enable your terminal app
+> Enable **Whisper Hotkey** (or your terminal app if running `./run.sh`)
 
 When you first run the daemon, macOS may pop up a permission dialog — click
 **Allow**. If it doesn't pop up and the hotkey doesn't work, check these
@@ -76,7 +93,7 @@ settings manually.
 
 ---
 
-## 3. Verify with the smoke test
+## 4. Verify with the smoke test
 
 ```bash
 cd ~/Developer/whisper-hotkey-daemon   # or wherever you chose to install
@@ -98,7 +115,13 @@ test may take a few minutes the very first time.)
 
 ---
 
-## 4. Run the daemon
+## 5. Run the daemon
+
+```bash
+open ~/Applications/Whisper\ Hotkey.app
+```
+
+Or run from the repo:
 
 ```bash
 ./run.sh                   # auto-detects Mac → mlx-whisper
@@ -113,6 +136,7 @@ The text is pasted automatically into the active window.
 View logs:
 ```bash
 tail -f ~/whisper_hotkey_mac.log
+tail -f ~/Library/Logs/Whisper\ Hotkey/daemon.log   # app wrapper log
 ```
 
 ---
@@ -166,7 +190,7 @@ cd whisper-hotkey-daemon
 ./install.sh
 ```
 
-Then continue from step 2 (Grant permissions) above. No Homebrew required for the
+Then continue from step 2 (Launch the app) above. No Homebrew required for the
 default mlx backend.
 
 ---

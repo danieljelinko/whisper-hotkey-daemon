@@ -18,8 +18,9 @@ Installs Pixi, downloads the repo to `~/Developer/whisper-hotkey-daemon` on
 macOS, and runs the full installer. The default macOS path uses mlx-whisper
 wheels, so it does not require Xcode CLT, Homebrew, or git. Re-running is safe.
 
-macOS only: after install, grant **Microphone** and **Accessibility** permissions
-in System Settings → Privacy & Security before running `./run.sh`.
+macOS only: after install, launch `~/Applications/Whisper Hotkey.app` and grant
+**Microphone** and **Accessibility** permissions to **Whisper Hotkey** in System
+Settings → Privacy & Security.
 
 For a more detailed walkthrough see [`docs/mac_setup.md`](docs/mac_setup.md).
 
@@ -39,8 +40,11 @@ the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daem
 **macOS** — no Homebrew or compiler needed; the model downloads on first use:
 ```bash
 ./install.sh   # installs Pixi + Python wheels incl. mlx-whisper
-./run.sh       # auto-detects macOS → mlx backend
+open ~/Applications/Whisper\ Hotkey.app
 ```
+The generated app wrapper runs the same daemon as `./run.sh`, but gives macOS a
+named app for Microphone and Accessibility permissions.
+
 Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then
 `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 

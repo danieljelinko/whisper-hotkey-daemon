@@ -57,17 +57,23 @@ if [ "$OS" = "Darwin" ]; then
     "$PIXI" install
 
     echo ""
+    echo "── Mac app wrapper ──"
+    bash "$SCRIPT_DIR/scripts/create_mac_app.sh"
+
+    echo ""
     echo "✓ macOS installation complete."
     echo "  Backend: mlx-whisper (Apple-Silicon native; model downloads on first transcription)."
     echo "  Tip: to use whisper.cpp instead, run scripts/101_install_whispercpp.sh and"
     echo "       launch with WHISPER_BACKEND=whispercpp_metal ./run.sh"
     echo ""
     echo "IMPORTANT — grant two macOS permissions before running:"
-    echo "  1. Microphone:   System Settings → Privacy & Security → Microphone → enable Terminal (or your terminal app)"
-    echo "  2. Accessibility: System Settings → Privacy & Security → Accessibility → enable Terminal (or your terminal app)"
+    echo "  1. Microphone:    System Settings → Privacy & Security → Microphone → enable Whisper Hotkey"
+    echo "  2. Accessibility: System Settings → Privacy & Security → Accessibility → enable Whisper Hotkey"
+    echo "     (If you run ./run.sh manually instead, enable your terminal app.)"
     echo ""
     echo "Verify setup:  ./scripts/test_mac_setup.sh"
     echo "Run daemon:    ./run.sh"
+    echo "Launch app:    open ~/Applications/Whisper\\ Hotkey.app"
 
 # ─── Linux ────────────────────────────────────────────────────────────────────
 elif [ "$OS" = "Linux" ]; then

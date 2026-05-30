@@ -72,8 +72,8 @@ hr; echo "3. Key imports"
 "$PIXI" run python -c "import flask" 2>/dev/null && ok "flask imports" || fail "flask missing"
 "$PIXI" run python -c "import mlx_whisper" 2>/dev/null && ok "mlx_whisper imports" || \
     fail "mlx_whisper missing — is this Apple Silicon? Run: ./install.sh"
-"$PIXI" run python -c "import pynput, pyperclip, requests, sounddevice, pyautogui" 2>/dev/null && \
-    ok "daemon deps import (pynput, pyperclip, requests, sounddevice, pyautogui)" || \
+"$PIXI" run python -c "import pynput, requests, sounddevice" 2>/dev/null && \
+    ok "daemon deps import (pynput, requests, sounddevice)" || \
     fail "a daemon dependency failed to import"
 
 # ─── 4. End-to-end: launch mlx server → transcribe fixture ───────────────────
