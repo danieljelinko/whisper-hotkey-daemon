@@ -87,7 +87,7 @@ if [ ! -f "$FIXTURE" ]; then
     warn "Skipping (fixture not found: $FIXTURE)"
 else
     LOG="$(mktemp)"
-    WHISPER_MLX_PORT="$PORT" "$PIXI" run python src/mlx_whisper_server.py >"$LOG" 2>&1 &
+    HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}" WHISPER_MLX_PORT="$PORT" "$PIXI" run python src/mlx_whisper_server.py >"$LOG" 2>&1 &
     SERVER_PID=$!
 
     echo -n "   Waiting for server (incl. possible model download)"

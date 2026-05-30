@@ -142,8 +142,8 @@ From `01_plan.md`:
 
 - **2.3** `scripts/test_mac_setup.sh` passes green on the Air (model downloads, transcribes)
 - **2.4** Manual hotkey→paste works; permissions granted; model/RAM tuned if needed
-  - 8 GB is tight for `large-v3-turbo`; try `WHISPER_MLX_MODEL=mlx-community/whisper-large-v3-turbo-q4` if too slow
-  - Record the chosen default model in `03_decisions.md`
+  - 8 GB is tight for non-quantized `large-v3-turbo`; default to `mlx-community/whisper-large-v3-turbo-q4`
+  - Record any later model changes in `03_decisions.md`
 
 Phase 3 (Windows, Parakeet, Voxtral) is future work, not committed.
 

@@ -10,7 +10,7 @@ is testable) on any platform with the boundary mocked.
 
 Run on a Mac:  uv run src/mlx_whisper_server.py
 Env:
-    WHISPER_MLX_MODEL   HuggingFace repo for the mlx model (default turbo)
+    WHISPER_MLX_MODEL   HuggingFace repo for the mlx model (default turbo q4)
     WHISPER_MLX_HOST    bind host (default 127.0.0.1)
     WHISPER_MLX_PORT    bind port (default 4444)
 """
@@ -18,7 +18,8 @@ import os, tempfile, pathlib
 from typing import Any
 from flask import Flask, request, jsonify
 
-MODEL = os.getenv("WHISPER_MLX_MODEL", "mlx-community/whisper-large-v3-turbo")
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+MODEL = os.getenv("WHISPER_MLX_MODEL", "mlx-community/whisper-large-v3-turbo-q4")
 
 
 def transcribe_audio(path: str) -> str:

@@ -137,8 +137,8 @@ runs are instant. To pre-download, just run `./scripts/test_mac_setup.sh` once.
 
 ### Transcription is slow even after the model is cached
 - Confirm you're on Apple Silicon (`uname -m` → `arm64`). mlx only accelerates there.
-- 8 GB Macs are tight; close memory-hungry apps. To try a smaller/faster model:
-  `WHISPER_MLX_MODEL=mlx-community/whisper-large-v3-turbo-q4 ./run.sh` (4-bit).
+- 8 GB Macs are tight; close memory-hungry apps. The default is the 4-bit
+  `mlx-community/whisper-large-v3-turbo-q4` model.
 - As a fallback you can switch to whisper.cpp: run `./scripts/101_install_whispercpp.sh`
   then `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 

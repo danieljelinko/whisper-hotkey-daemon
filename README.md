@@ -32,7 +32,7 @@ the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daem
 
 | Platform | Default backend | Model | Acceleration |
 |---|---|---|---|
-| macOS (Apple Silicon) | [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper) (installs as wheels) | `mlx-community/whisper-large-v3-turbo` | MLX (Apple GPU) |
+| macOS (Apple Silicon) | [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper) (installs as wheels) | `mlx-community/whisper-large-v3-turbo-q4` | MLX (Apple GPU) |
 | Linux + NVIDIA GPU | Docker `whisper-assistant` | faster-whisper `turbo` | CUDA |
 | Linux, no GPU | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) server (CPU build) | `ggml-large-v3-turbo-q5_0` | CPU |
 
