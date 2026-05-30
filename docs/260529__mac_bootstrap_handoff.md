@@ -77,8 +77,8 @@ open ~/Applications/tigris-whisper.app
 ```
 
 You can also use Finder → Applications → double-click `tigris-whisper.app`.
-Launching first matters because macOS may not show the app under Microphone
-until it has requested access once.
+Launching first matters because the daemon now requests Microphone access at
+startup; that request is what makes the app appear under Microphone settings.
 
 ### Step 2 — Grant macOS permissions (required)
 
@@ -146,7 +146,7 @@ docs/
 ```bash
 uv run pytest -q                    # 11 Python tests
 bash tests/test_run_dispatch.sh      # 6 shell assertions
-bash tests/test_install_uninstall.sh # 23 shell assertions
+bash tests/test_install_uninstall.sh # 24 shell assertions
 ```
 
 ---

@@ -130,9 +130,15 @@ grep -q "Finder → Applications → double-click tigris-whisper.app" "$bootstra
     ok "bootstrap.sh includes Finder launch path" || \
     fail "bootstrap.sh includes Finder launch path"
 
-grep -q "may not appear in Microphone settings until it asks once" "$bootstrap_out" && \
-    ok "bootstrap.sh explains Microphone appears after first request" || \
-    fail "bootstrap.sh explains Microphone appears after first request"
+if grep -q "may not appear in Microphone settings until it asks once" "$bootstrap_out"; then
+    fail "bootstrap.sh should not say Microphone waits for first hotkey"
+else
+    ok "bootstrap.sh does not claim Microphone waits for first hotkey"
+fi
+
+grep -q "asks for Microphone access at startup" "$bootstrap_out" && \
+    ok "bootstrap.sh says app requests Microphone at startup" || \
+    fail "bootstrap.sh says app requests Microphone at startup"
 
 grep -q "4. Confirm Microphone is enabled:" "$bootstrap_out" && \
     ok "bootstrap.sh gives explicit Microphone permission step" || \

@@ -151,7 +151,7 @@ if [ "$OS" = "Darwin" ]; then
     echo "   Or open Finder → Applications → double-click tigris-whisper.app"
     echo ""
     echo "2. If macOS asks for Microphone access, click Allow."
-    echo "   The app may not appear in Microphone settings until it asks once."
+    echo "   The app asks for Microphone access at startup so it appears in settings."
     echo ""
     echo "3. Open macOS permissions:"
     echo "   System Settings → Privacy & Security"

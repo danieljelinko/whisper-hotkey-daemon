@@ -58,6 +58,19 @@ pressed      = set()
 def _audio_cb(indata, frames, t, status):
     queue_frames.put(indata.copy())
 
+def preflight_microphone():
+    """Trigger macOS microphone consent at app startup instead of first hotkey."""
+    try:
+        with sd.InputStream(samplerate=RATE, channels=CHANNELS, dtype="int16"):
+            time.sleep(0.1)
+        log.info("Microphone preflight OK")
+    except Exception as e:
+        log.warning("Microphone preflight failed or permission missing: %s", e)
+        notify(
+            "Microphone permission needed",
+            "Open Privacy & Security → Microphone and enable tigris-whisper.",
+        )
+
 def start_recording():
     global stream
     if stream is not None:
@@ -119,6 +132,7 @@ def on_release(key):
 
 log.info("Whisper hot-key daemon (macOS) ready. "
          "Hold Ctrl+Option+Space to record; release Ctrl to stop.  API=%s", API)
+preflight_microphone()
 
 try:
     with Listener(on_press=on_press, on_release=on_release) as listener:

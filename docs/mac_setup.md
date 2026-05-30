@@ -93,12 +93,12 @@ instead, grant permissions to your terminal app, not `tigris-whisper`.
 
 **This step is required.** Without it, the daemon starts but recording and/or
 paste will silently fail. Launch the app first so macOS can ask for Microphone
-access; the app may not appear in Microphone settings until it has asked once.
-If you run `./run.sh` manually, grant permissions to your terminal app instead.
+access at startup; this is what makes it appear in Microphone settings. If you
+run `./run.sh` manually, grant permissions to your terminal app instead.
 
 ### Microphone
 > System Settings → Privacy & Security → **Microphone**
-> Enable **tigris-whisper** after the app has requested access
+> Enable **tigris-whisper** after launching the app
 
 ### Accessibility (hotkey + paste)
 > System Settings → Privacy & Security → **Accessibility**

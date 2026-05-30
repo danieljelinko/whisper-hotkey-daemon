@@ -37,7 +37,7 @@ mocked, and the real inference is verified on-device.
 - [x] 2.1 `lib/backend_mlx.sh` + `run.sh` mlx case; `backend_select` Darwin→`mlx`
 - [x] 2.2 installer/bootstrap drop Homebrew on Mac (Pixi wheels/env only); `scripts/test_mac_setup.sh` for mlx
 - [x] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
-- [ ] 2.4 **on-device:** launch app first, trigger/grant Mic + Accessibility, confirm hotkey→paste; tune model/RAM on 8 GB
+- [ ] 2.4 **on-device:** launch app, confirm startup Mic prompt + Accessibility, confirm hotkey→paste; tune model/RAM on 8 GB
 - [x] 2.5 tarball-based bootstrap (curl fallback when git absent) → zero Xcode CLT for end users
 
 ## Phase 3 — Optional future backends / platforms (not committed; see 03_decisions)
@@ -55,4 +55,5 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [x] 4.5 Add tested uninstall path for app wrapper, logs/state, install dir, and downloaded model cache
 - [x] 4.6 Rename user-facing product/repo to `tigris-whisper` after GitHub repo rename is coordinated
 - [x] 4.7 Bootstrap automatically runs Mac smoke test/model warmup and makes app launch the normal user path
-- [ ] 4.8 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
+- [x] 4.8 Mac daemon requests Microphone permission at app startup so it appears in Privacy settings
+- [ ] 4.9 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
