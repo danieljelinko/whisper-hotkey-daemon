@@ -17,7 +17,7 @@
 ## Done
 | Date | Task | Verified by |
 |---|---|---|
-| 2026-05-30 | Phase 4.5: uninstall script added | `bash -n uninstall.sh`; script removes app wrapper, logs/state, known mlx model cache, and optionally install dir / Pixi |
+| 2026-05-30 | Phase 4.5: uninstall script added with tests | `tests/test_install_uninstall.sh` → 12 passed; covers fake-mac install wrapper creation and temp-HOME uninstall of app/logs/state/model cache/install dir |
 | 2026-05-30 | Phase 4.1–4.3: generated `Whisper Hotkey.app` wrapper | SSH to M1 Air: clean install from GitHub `main`; app bundle `Info.plist` lint OK; `open ~/Applications/Whisper\ Hotkey.app` starts daemon and logs under `~/Library/Logs/Whisper Hotkey/daemon.log` |
 | 2026-05-30 | Clean Mac tarball install + mlx q4 smoke test green | SSH to M1 Air: clean install from GitHub `main`; `scripts/test_mac_setup.sh` → 10 passed / 0 failed; transcript fixture recognized |
 | 2026-05-30 | Mac install path switched to Pixi + ffmpeg | SSH clean install: Pixi env created without Xcode CLT/Homebrew; `ffmpeg` available; mlx-whisper transcribes |
