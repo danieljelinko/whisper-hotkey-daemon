@@ -1,6 +1,6 @@
-# Mac Setup — whisper-hotkey-daemon
+# Mac Setup — tigris-whisper
 
-This is the complete guide to running the whisper-hotkey daemon on a Mac
+This is the complete guide to running tigris-whisper on a Mac
 (Apple Silicon — M1, M2, M3, M4). It covers setup from scratch and includes a
 smoke test script you can run to verify everything works before touching the
 daemon itself.
@@ -21,22 +21,22 @@ on Apple Silicon). No network call, no API key, no data leaving your machine.
 Open **Terminal** (search Spotlight → "Terminal"), paste this, and press Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/danieljelinko/tigris-whisper/main/bootstrap.sh | bash
 ```
 
 That's it. The bootstrap script handles everything in order:
 
 | Step | What happens |
 |---|---|
-| Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
+| Install dir | Asks where to install — press Enter for the default `~/Developer/tigris-whisper` |
 | Fetch | Uses `git clone` if git exists, otherwise downloads a clean tarball with `curl` — **no Xcode CLT required** |
 | Pixi | Installed via its standalone installer (no compiler needed) |
 | Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper**, plus `ffmpeg` for audio loading |
-| App wrapper | Creates `~/Applications/Whisper Hotkey.app` so users can launch a named app instead of Terminal |
+| App wrapper | Creates `~/Applications/tigris-whisper.app` so users can launch a named app instead of Terminal |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
+> curl -fsSL https://raw.githubusercontent.com/danieljelinko/tigris-whisper/main/bootstrap.sh | WHISPER_INSTALL_DIR=~/my-dir bash
 > ```
 
 **No Xcode Command Line Tools, no Homebrew, no compiling.** The repo comes as a
@@ -47,7 +47,7 @@ from HuggingFace the first time you transcribe** — so your *first* dictation h
 a one-time delay, everything after is instant.
 
 If the install directory already exists from an older tarball install, bootstrap
-moves it aside to `whisper-hotkey-daemon.backup.<timestamp>` before extracting.
+moves it aside to `tigris-whisper.backup.<timestamp>` before extracting.
 That keeps reinstall tests clean and avoids stale files from previous attempts.
 
 > **Developers:** if you want a real git checkout (to pull/commit, e.g. continuing
@@ -63,29 +63,29 @@ That keeps reinstall tests clean and avoids stale files from previous attempts.
 After install, you can either run the CLI or launch the app wrapper:
 
 ```bash
-open ~/Applications/Whisper\ Hotkey.app
+open ~/Applications/tigris-whisper.app
 ```
 
 The app runs the same local daemon as `./run.sh` and writes logs to:
 
 ```bash
-~/Library/Logs/Whisper Hotkey/daemon.log
+~/Library/Logs/tigris-whisper/daemon.log
 ```
 
 ## 3. Grant macOS permissions
 
 **This step is required.** Without it, the daemon starts but recording and/or
 paste will silently fail. If you launch the app wrapper, grant permissions to
-**Whisper Hotkey**. If you run `./run.sh` manually, grant permissions to your
+**tigris-whisper**. If you run `./run.sh` manually, grant permissions to your
 terminal app.
 
 ### Microphone
 > System Settings → Privacy & Security → **Microphone**
-> Enable **Whisper Hotkey** (or your terminal app if running `./run.sh`)
+> Enable **tigris-whisper** (or your terminal app if running `./run.sh`)
 
 ### Accessibility (hotkey + paste)
 > System Settings → Privacy & Security → **Accessibility**
-> Enable **Whisper Hotkey** (or your terminal app if running `./run.sh`)
+> Enable **tigris-whisper** (or your terminal app if running `./run.sh`)
 
 When you first run the daemon, macOS may pop up a permission dialog — click
 **Allow**. If it doesn't pop up and the hotkey doesn't work, check these
@@ -96,7 +96,7 @@ settings manually.
 ## 4. Verify with the smoke test
 
 ```bash
-cd ~/Developer/whisper-hotkey-daemon   # or wherever you chose to install
+cd ~/Developer/tigris-whisper   # or wherever you chose to install
 ./scripts/test_mac_setup.sh
 ```
 
@@ -118,7 +118,7 @@ test may take a few minutes the very first time.)
 ## 5. Run the daemon
 
 ```bash
-open ~/Applications/Whisper\ Hotkey.app
+open ~/Applications/tigris-whisper.app
 ```
 
 Or run from the repo:
@@ -136,7 +136,7 @@ The text is pasted automatically into the active window.
 View logs:
 ```bash
 tail -f ~/whisper_hotkey_mac.log
-tail -f ~/Library/Logs/Whisper\ Hotkey/daemon.log   # app wrapper log
+tail -f ~/Library/Logs/tigris-whisper/daemon.log   # app wrapper log
 ```
 
 ---
@@ -146,7 +146,7 @@ tail -f ~/Library/Logs/Whisper\ Hotkey/daemon.log   # app wrapper log
 From the install directory:
 
 ```bash
-cd ~/Developer/whisper-hotkey-daemon   # or wherever you installed it
+cd ~/Developer/tigris-whisper   # or wherever you installed it
 ./uninstall.sh
 ```
 
@@ -154,7 +154,7 @@ The uninstaller removes:
 
 | Item | Default |
 |---|---|
-| `~/Applications/Whisper Hotkey.app` | removed |
+| `~/Applications/tigris-whisper.app` | removed |
 | app logs/state under `~/Library` | removed |
 | known mlx-whisper HuggingFace model cache | removed |
 | install directory/repo | asks before removing |
@@ -163,7 +163,7 @@ The uninstaller removes:
 Fully unattended removal:
 
 ```bash
-cd ~/Developer/whisper-hotkey-daemon
+cd ~/Developer/tigris-whisper
 ./uninstall.sh --yes
 ```
 
@@ -222,8 +222,8 @@ curl -fsSL https://pixi.sh/install.sh | sh
 source ~/.pixi/env   # or restart Terminal
 
 # 3. Clone and install (Pixi pulls Python and mlx-whisper wheels — no compiler, no brew)
-git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git
-cd whisper-hotkey-daemon
+git clone https://github.com/danieljelinko/tigris-whisper.git
+cd tigris-whisper
 ./install.sh
 ```
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Uninstall whisper-hotkey-daemon from this Mac/Linux user account.
+# Uninstall tigris-whisper from this Mac/Linux user account.
 # By default this removes generated app/state/log files and the known project
 # model cache. Removing the repo/install directory is opt-in unless --yes is
 # used from inside the install directory.
@@ -111,14 +111,14 @@ hf_cache_dir_for_model() {
     printf "%s/.cache/huggingface/hub/models--%s\n" "$HOME" "${model//\//--}"
 }
 
-echo "=== whisper-hotkey-daemon uninstall ==="
+echo "=== tigris-whisper uninstall ==="
 echo "Install directory: $INSTALL_DIR"
 echo ""
 
 if [ "$OS" = "Darwin" ]; then
-    APP_DIR="${WHISPER_APP_PARENT:-$HOME/Applications}/${WHISPER_APP_NAME:-Whisper Hotkey.app}"
-    LOG_DIR="$HOME/Library/Logs/Whisper Hotkey"
-    STATE_DIR="$HOME/Library/Application Support/Whisper Hotkey"
+    APP_DIR="${WHISPER_APP_PARENT:-$HOME/Applications}/${WHISPER_APP_NAME:-tigris-whisper.app}"
+    LOG_DIR="$HOME/Library/Logs/tigris-whisper"
+    STATE_DIR="$HOME/Library/Application Support/tigris-whisper"
     PID_FILE="$STATE_DIR/daemon.pid"
 
     kill_pid_file "$PID_FILE"

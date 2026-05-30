@@ -1,14 +1,12 @@
 # 02 · Progress
 
 ## In flight
-- Phase 4.4: manual GUI test — double-click **Whisper Hotkey.app**, grant
+- Phase 4.4: manual GUI test — double-click **tigris-whisper.app**, grant
   Microphone + Accessibility, confirm hotkey→paste in a real text field.
-- Product rename planning: user-facing app/repo target is `tigris-whisper`, but
-  bootstrap URL changes must wait until the GitHub repo is renamed.
 
 ## Next
 - On the Air: install generated app → double-click → grant Mic + Accessibility
-  to **Whisper Hotkey** → manual hotkey→paste check.
+  to **tigris-whisper** → manual hotkey→paste check.
 
 ## Blocked
 - Manual permission/hotkey validation still requires the Mac UI session. SSH can
@@ -17,8 +15,9 @@
 ## Done
 | Date | Task | Verified by |
 |---|---|---|
+| 2026-05-30 | Phase 4.6: renamed user-facing product/repo to `tigris-whisper` | GitHub repo renamed first; source now uses `danieljelinko/tigris-whisper`, `~/Developer/tigris-whisper`, `tigris-whisper.app`, `com.danieljelinko.tigris-whisper`; `tests/test_install_uninstall.sh` covers renamed app/install paths |
 | 2026-05-30 | Phase 4.5: uninstall script added with tests | `tests/test_install_uninstall.sh` → 12 passed; covers fake-mac install wrapper creation and temp-HOME uninstall of app/logs/state/model cache/install dir |
-| 2026-05-30 | Phase 4.1–4.3: generated `Whisper Hotkey.app` wrapper | SSH to M1 Air: clean install from GitHub `main`; app bundle `Info.plist` lint OK; `open ~/Applications/Whisper\ Hotkey.app` starts daemon and logs under `~/Library/Logs/Whisper Hotkey/daemon.log` |
+| 2026-05-30 | Phase 4.1–4.3: generated app wrapper | SSH to M1 Air verified the app-wrapper launch path before rename; current `tigris-whisper.app` bundle name, id, logs, and state paths are covered by `tests/test_install_uninstall.sh` |
 | 2026-05-30 | Clean Mac tarball install + mlx q4 smoke test green | SSH to M1 Air: clean install from GitHub `main`; `scripts/test_mac_setup.sh` → 10 passed / 0 failed; transcript fixture recognized |
 | 2026-05-30 | Mac install path switched to Pixi + ffmpeg | SSH clean install: Pixi env created without Xcode CLT/Homebrew; `ffmpeg` available; mlx-whisper transcribes |
 | 2026-05-29 | Switch Mac default to mlx-whisper | 11 pytest + 6 dispatch green on Linux; mlx server contract tested with mocked boundary; real inference deferred to the Air |

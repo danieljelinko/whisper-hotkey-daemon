@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Single entry point for the whisper-hotkey daemon.
+# Single entry point for tigris-whisper.
 # Auto-detects the host platform and GPU, brings up the right transcription
 # backend, then launches the OS-appropriate daemon.
 #
@@ -100,7 +100,7 @@ esac
 # ─── Launch the daemon ────────────────────────────────────────────────────────
 
 echo ""
-echo "Backend ready. Starting Whisper Hotkey Daemon…"
+echo "Backend ready. Starting tigris-whisper Daemon…"
 echo "Hold Ctrl+Alt+Space to record; release Ctrl to transcribe and paste."
 echo ""
 

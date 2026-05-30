@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# bootstrap.sh — download and install whisper-hotkey-daemon from scratch.
+# bootstrap.sh — download and install tigris-whisper from scratch.
 #
 # One-liner install (copy and paste into Terminal):
 #
-#   curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/danieljelinko/tigris-whisper/main/bootstrap.sh | bash
 #
 # What this script does:
-#   1. Asks where to install (default: ~/Developer/whisper-hotkey-daemon on Mac)
+#   1. Asks where to install (default: ~/Developer/tigris-whisper on Mac)
 #   2. Fetches the repo — git clone if git exists, else a curl tarball (no Xcode CLT!)
 #   3. Runs ./install.sh (installs Pixi + Python wheels incl. mlx-whisper on macOS)
 #
@@ -24,19 +24,19 @@
 
 set -euo pipefail
 
-REPO_SLUG="danieljelinko/whisper-hotkey-daemon"
+REPO_SLUG="danieljelinko/tigris-whisper"
 REPO_URL="https://github.com/${REPO_SLUG}.git"
 REPO_REF="${WHISPER_REF:-main}"
 OS="$(uname -s)"
 
 # On macOS the Apple-recognised folder for dev projects is ~/Developer (Finder
 # gives it a hammer icon). On Linux, ~ keeps it simple. Either is a fine default.
-if [ "$OS" = "Darwin" ]; then DEFAULT_DIR="$HOME/Developer/whisper-hotkey-daemon"
-else                          DEFAULT_DIR="$HOME/whisper-hotkey-daemon"; fi
+if [ "$OS" = "Darwin" ]; then DEFAULT_DIR="$HOME/Developer/tigris-whisper"
+else                          DEFAULT_DIR="$HOME/tigris-whisper"; fi
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
-echo "║      whisper-hotkey-daemon  bootstrap            ║"
+echo "║      tigris-whisper  bootstrap            ║"
 echo "║  Hold a key → speak → release → text is pasted   ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
@@ -132,11 +132,11 @@ if [ "$OS" = "Darwin" ]; then
     echo ""
     echo "  1. Microphone:"
     echo "     System Settings → Privacy & Security → Microphone"
-    echo "     ✦ enable Whisper Hotkey"
+    echo "     ✦ enable tigris-whisper"
     echo ""
     echo "  2. Accessibility (for the hotkey and paste):"
     echo "     System Settings → Privacy & Security → Accessibility"
-    echo "     ✦ enable Whisper Hotkey"
+    echo "     ✦ enable tigris-whisper"
     echo ""
     echo "  If you run ./run.sh manually instead of the app, enable your terminal app."
     echo ""
@@ -144,7 +144,7 @@ if [ "$OS" = "Darwin" ]; then
     echo "    cd $INSTALL_DIR && ./scripts/test_mac_setup.sh"
     echo ""
     echo "  Launch the app wrapper:"
-    echo "    open ~/Applications/Whisper\\ Hotkey.app"
+    echo "    open ~/Applications/tigris-whisper.app"
     echo ""
 fi
 echo "  Start the daemon:"

@@ -1,4 +1,4 @@
-# Whisper Hotkey Daemon
+# tigris-whisper Daemon
 
 A lightweight Python daemon that records audio from your microphone on a global hot-key (`Ctrl + Alt + Space`), sends it to a Docker-hosted Whisper transcription server, and places the resulting text in your clipboard (optionally pasting it into the active window).
 
@@ -11,15 +11,15 @@ Inspired by [MartinOpenSky's Whisper Assistant VSCode extension](https://github.
 Paste this into Terminal (macOS or Linux) — it handles everything from scratch:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/danieljelinko/tigris-whisper/main/bootstrap.sh | bash
 ```
 
-Installs Pixi, downloads the repo to `~/Developer/whisper-hotkey-daemon` on
+Installs Pixi, downloads the repo to `~/Developer/tigris-whisper` on
 macOS, and runs the full installer. The default macOS path uses mlx-whisper
 wheels, so it does not require Xcode CLT, Homebrew, or git. Re-running is safe.
 
-macOS only: after install, launch `~/Applications/Whisper Hotkey.app` and grant
-**Microphone** and **Accessibility** permissions to **Whisper Hotkey** in System
+macOS only: after install, launch `~/Applications/tigris-whisper.app` and grant
+**Microphone** and **Accessibility** permissions to **tigris-whisper** in System
 Settings → Privacy & Security.
 
 Uninstall from the install directory:
@@ -50,7 +50,7 @@ the same `POST /v1/audio/transcriptions` endpoint on `:4444`, so the Python daem
 **macOS** — no Homebrew or compiler needed; the model downloads on first use:
 ```bash
 ./install.sh   # installs Pixi + Python wheels incl. mlx-whisper
-open ~/Applications/Whisper\ Hotkey.app
+open ~/Applications/tigris-whisper.app
 ```
 The generated app wrapper runs the same daemon as `./run.sh`, but gives macOS a
 named app for Microphone and Accessibility permissions.
@@ -133,8 +133,8 @@ pip install pynput pyperclip requests sounddevice soundfile numpy pyautogui win1
 1. **Clone or download** this repository to `~/.local/bin`:
 
    ```bash
-   mkdir -p ~/.local/bin && git clone https://github.com/danieljelinko/whisper-hotkey-daemon.git ~/.local/bin/whisper-hotkey
-   cd ~/.local/bin/whisper-hotkey
+   mkdir -p ~/.local/bin && git clone https://github.com/danieljelinko/tigris-whisper.git ~/.local/bin/tigris-whisper
+   cd ~/.local/bin/tigris-whisper
    chmod +x whisper_hotkey_linux.py
    ```
 

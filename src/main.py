@@ -1,5 +1,5 @@
 def main():
-    print("Hello from whisper-hotkey-daemon!")
+    print("Hello from tigris-whisper!")
 
 
 if __name__ == "__main__":

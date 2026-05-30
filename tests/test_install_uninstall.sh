@@ -51,12 +51,12 @@ else
     fail "install.sh macOS path exits successfully with fake pixi"
 fi
 
-APP_DIR="$APP_PARENT/Whisper Hotkey.app"
-[ -x "$APP_DIR/Contents/MacOS/Whisper Hotkey" ] && \
+APP_DIR="$APP_PARENT/tigris-whisper.app"
+[ -x "$APP_DIR/Contents/MacOS/tigris-whisper" ] && \
     ok "install.sh creates executable app wrapper" || \
     fail "install.sh creates executable app wrapper"
 
-grep -q "com.danieljelinko.whisper-hotkey" "$APP_DIR/Contents/Info.plist" && \
+grep -q "com.danieljelinko.tigris-whisper" "$APP_DIR/Contents/Info.plist" && \
     ok "app wrapper plist contains bundle id" || \
     fail "app wrapper plist contains bundle id"
 
@@ -67,14 +67,14 @@ grep -q "Uninstall:     ./uninstall.sh" "$install_out" && \
 # ─── uninstall.sh: removes generated app/state/logs/model/install dir safely ──
 
 mkdir -p \
-    "$HOME/Library/Logs/Whisper Hotkey" \
-    "$HOME/Library/Application Support/Whisper Hotkey" \
+    "$HOME/Library/Logs/tigris-whisper" \
+    "$HOME/Library/Application Support/tigris-whisper" \
     "$HOME/.cache/huggingface/hub/models--mlx-community--whisper-large-v3-turbo-q4" \
     "$HOME/.cache/whisper.cpp" \
     "$INSTALL_DIR"
 touch \
-    "$HOME/Library/Logs/Whisper Hotkey/daemon.log" \
-    "$HOME/Library/Application Support/Whisper Hotkey/daemon.pid" \
+    "$HOME/Library/Logs/tigris-whisper/daemon.log" \
+    "$HOME/Library/Application Support/tigris-whisper/daemon.pid" \
     "$HOME/.cache/huggingface/hub/models--mlx-community--whisper-large-v3-turbo-q4/model.safetensors" \
     "$HOME/.cache/whisper.cpp/mlx_server.log" \
     "$INSTALL_DIR/bootstrap.sh"
@@ -91,11 +91,11 @@ fi
     ok "uninstall.sh removes app wrapper" || \
     fail "uninstall.sh removes app wrapper"
 
-[ ! -e "$HOME/Library/Logs/Whisper Hotkey" ] && \
+[ ! -e "$HOME/Library/Logs/tigris-whisper" ] && \
     ok "uninstall.sh removes app logs" || \
     fail "uninstall.sh removes app logs"
 
-[ ! -e "$HOME/Library/Application Support/Whisper Hotkey" ] && \
+[ ! -e "$HOME/Library/Application Support/tigris-whisper" ] && \
     ok "uninstall.sh removes app state" || \
     fail "uninstall.sh removes app state"
 

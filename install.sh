@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# One-stop installer for whisper-hotkey-daemon.
+# One-stop installer for tigris-whisper.
 # Detects the OS and backend, installs all system dependencies, then sets up
 # the whisper.cpp server and downloads the default model.
 #
@@ -24,7 +24,7 @@ if [ -z "$WHISPER_BACKEND" ]; then
     fi
 fi
 
-echo "=== whisper-hotkey-daemon installer ==="
+echo "=== tigris-whisper installer ==="
 echo "OS: $OS | Backend: $WHISPER_BACKEND"
 echo ""
 
@@ -67,13 +67,13 @@ if [ "$OS" = "Darwin" ]; then
     echo "       launch with WHISPER_BACKEND=whispercpp_metal ./run.sh"
     echo ""
     echo "IMPORTANT — grant two macOS permissions before running:"
-    echo "  1. Microphone:    System Settings → Privacy & Security → Microphone → enable Whisper Hotkey"
-    echo "  2. Accessibility: System Settings → Privacy & Security → Accessibility → enable Whisper Hotkey"
+    echo "  1. Microphone:    System Settings → Privacy & Security → Microphone → enable tigris-whisper"
+    echo "  2. Accessibility: System Settings → Privacy & Security → Accessibility → enable tigris-whisper"
     echo "     (If you run ./run.sh manually instead, enable your terminal app.)"
     echo ""
     echo "Verify setup:  ./scripts/test_mac_setup.sh"
     echo "Run daemon:    ./run.sh"
-    echo "Launch app:    open ~/Applications/Whisper\\ Hotkey.app"
+    echo "Launch app:    open ~/Applications/tigris-whisper.app"
     echo "Uninstall:     ./uninstall.sh"
 
 # ─── Linux ────────────────────────────────────────────────────────────────────

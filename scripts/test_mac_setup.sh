@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test for the macOS whisper-hotkey setup (mlx-whisper backend).
+# Smoke test for the macOS tigris-whisper setup (mlx-whisper backend).
 # Run this after ./install.sh to verify every piece works before you try the
 # daemon for the first time.
 #
@@ -44,7 +44,7 @@ cache_size() {
 }
 
 echo ""
-echo "=== whisper-hotkey-daemon Mac smoke test (mlx-whisper) ==="
+echo "=== tigris-whisper Mac smoke test (mlx-whisper) ==="
 echo "Repo: $REPO_DIR"
 cd "$REPO_DIR"
 
@@ -151,9 +151,9 @@ BACKEND="$(bash run.sh --print-backend 2>/dev/null || echo error)"
 hr; echo "6. macOS permissions (verify manually — cannot be tested automatically)"
 echo ""
 echo "  Grant both before running the daemon, or recording/paste fail silently."
-echo "  If launching the app wrapper, enable Whisper Hotkey:"
-echo "    Microphone:    System Settings → Privacy & Security → Microphone → Whisper Hotkey"
-echo "    Accessibility: System Settings → Privacy & Security → Accessibility → Whisper Hotkey"
+echo "  If launching the app wrapper, enable tigris-whisper:"
+echo "    Microphone:    System Settings → Privacy & Security → Microphone → tigris-whisper"
+echo "    Accessibility: System Settings → Privacy & Security → Accessibility → tigris-whisper"
 echo "  If running ./run.sh manually, enable your terminal app instead."
 echo ""
 warn "Verify the two permissions above before running ./run.sh"

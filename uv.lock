@@ -1114,7 +1114,7 @@ wheels = [
 ]
 
 [[package]]
-name = "whisper-hotkey-daemon"
+name = "tigris-whisper"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

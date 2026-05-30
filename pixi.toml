@@ -1,5 +1,5 @@
 [workspace]
-name = "whisper-hotkey-daemon"
+name = "tigris-whisper"
 version = "0.1.0"
 description = "Local whisper hotkey daemon for macOS and Linux"
 channels = ["conda-forge"]
