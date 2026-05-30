@@ -8,6 +8,7 @@ platforms = ["osx-arm64"]
 [dependencies]
 python = "3.12.*"
 pip = "*"
+ffmpeg = "*"
 
 [pypi-dependencies]
 pynput = "*"

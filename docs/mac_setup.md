@@ -31,7 +31,7 @@ That's it. The bootstrap script handles everything in order:
 | Install dir | Asks where to install — press Enter for the default `~/Developer/whisper-hotkey-daemon` |
 | Fetch | Uses `git clone` if git exists, otherwise downloads a clean tarball with `curl` — **no Xcode CLT required** |
 | Pixi | Installed via its standalone installer (no compiler needed) |
-| Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper** |
+| Python deps | `pixi install` creates a Python 3.12 env and installs prebuilt wheels, **including mlx-whisper**, plus `ffmpeg` for audio loading |
 
 > `~/Developer` is Apple's recognised folder for development projects (Finder shows it with a hammer icon). To install elsewhere without being prompted:
 > ```bash
