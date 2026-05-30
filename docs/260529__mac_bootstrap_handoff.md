@@ -37,6 +37,8 @@ install/uninstall tests until the next clean Mac run:
 - the app launcher starts the daemon and writes logs to
   `~/Library/Logs/tigris-whisper/daemon.log` (same wrapper behavior was
   SSH-verified before rename; renamed paths are covered by tests)
+- no window opens; the app is a background wrapper and posts a macOS
+  notification when starting or failing
 - `./uninstall.sh` removes the app wrapper, logs/state, known project model
   cache, and optionally the install directory / Pixi
 
@@ -144,7 +146,7 @@ docs/
 ```bash
 uv run pytest -q                    # 11 Python tests
 bash tests/test_run_dispatch.sh      # 6 shell assertions
-bash tests/test_install_uninstall.sh # 22 shell assertions
+bash tests/test_install_uninstall.sh # 23 shell assertions
 ```
 
 ---

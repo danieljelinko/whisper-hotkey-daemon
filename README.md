@@ -60,6 +60,9 @@ The generated app wrapper is the normal user path. It runs the same daemon as
 permissions. `./run.sh` is the manual/developer path from inside the repo; if
 you use it, grant permissions to your terminal app instead.
 
+No app window opens; tigris-whisper runs in the background and writes logs to
+`~/Library/Logs/tigris-whisper/daemon.log`.
+
 Optional whisper.cpp Metal fallback: `./scripts/101_install_whispercpp.sh` then
 `WHISPER_BACKEND=whispercpp_metal ./run.sh`.
 

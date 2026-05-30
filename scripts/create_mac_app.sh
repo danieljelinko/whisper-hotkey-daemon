@@ -66,10 +66,15 @@ PID_FILE="$STATE_DIR/daemon.pid"
 
 mkdir -p "$LOG_DIR" "$STATE_DIR"
 
+notify() {
+    local message="$1"
+    osascript -e "display notification \"$message\" with title \"tigris-whisper\"" >/dev/null 2>&1 || true
+}
+
 if [ -f "$PID_FILE" ]; then
     OLD_PID="$(cat "$PID_FILE" 2>/dev/null || true)"
     if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
-        osascript -e 'display notification "tigris-whisper is already running." with title "tigris-whisper"' >/dev/null 2>&1 || true
+        notify "Already running in the background."
         exit 0
     fi
 fi
@@ -80,12 +85,25 @@ trap cleanup EXIT
 
 export PATH="$HOME/.pixi/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
+notify "Starting in the background. Hold Ctrl+Option+Space to record."
+STATUS=0
 {
     echo "===== $(date) starting tigris-whisper ====="
     echo "Repo: $REPO_DIR"
     cd "$REPO_DIR"
+    set +e
     ./run.sh
+    STATUS=$?
+    set -e
+    echo "===== $(date) tigris-whisper exited with status $STATUS ====="
 } >> "$LOG_FILE" 2>&1
+
+if [ "$STATUS" -ne 0 ]; then
+    notify "Could not start. See ~/Library/Logs/tigris-whisper/daemon.log"
+else
+    notify "Stopped."
+fi
+exit "$STATUS"
 LAUNCHER
 
 chmod +x "$MACOS/$EXECUTABLE"

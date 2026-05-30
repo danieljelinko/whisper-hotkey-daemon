@@ -70,6 +70,10 @@ grep -q "com.danieljelinko.tigris-whisper" "$APP_DIR/Contents/Info.plist" && \
     ok "app wrapper plist contains bundle id" || \
     fail "app wrapper plist contains bundle id"
 
+grep -q "Starting in the background" "$APP_DIR/Contents/MacOS/tigris-whisper" && \
+    ok "app wrapper notifies on background start" || \
+    fail "app wrapper notifies on background start"
+
 grep -q "Uninstall:     ./uninstall.sh" "$install_out" && \
     ok "install.sh prints uninstall command" || \
     fail "install.sh prints uninstall command"

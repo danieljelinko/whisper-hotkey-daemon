@@ -79,6 +79,13 @@ writes logs to:
 ~/Library/Logs/tigris-whisper/daemon.log
 ```
 
+No window opens. A successful launch runs in the background and posts a macOS
+notification. If nothing appears, check the log:
+
+```bash
+tail -80 ~/Library/Logs/tigris-whisper/daemon.log
+```
+
 `./run.sh` is the manual/developer path from inside the repo. If you use that
 instead, grant permissions to your terminal app, not `tigris-whisper`.
 
