@@ -9,49 +9,39 @@ This document hands off the Mac-side work to an agent running on the MacBook Air
 `whisper-hotkey-daemon` — hold **Ctrl+Option+Space**, speak, release Ctrl → text
 is transcribed locally and pasted into the active window. The repo lives at:
 `https://github.com/danieljelinko/whisper-hotkey-daemon`
-Active branch: `feat/multi-platform-backends`
+Active branch: `main`
 
 The Mac backend is **mlx-whisper** (Apple-Silicon native, installs as Python
-wheels in a Pixi environment, no Homebrew, no compiler). The Whisper model (~1.5 GB) downloads
-from HuggingFace on first transcription. The entry point is `./run.sh`.
+wheels in a Pixi environment, no Homebrew, no compiler). The default model is
+`mlx-community/whisper-large-v3-turbo-q4`; it downloads from HuggingFace on
+first transcription. The CLI entry point is `./run.sh`; the user-facing entry
+point is the generated `~/Applications/Whisper Hotkey.app`.
 
 ---
 
 ## Current situation
 
-### Bootstrap bugs (just fixed — verify they work)
+The no-Xcode Mac install path is now on `main` and has been verified over SSH on
+an M1 Air:
 
-**Symptom:** running the one-liner on a fresh Mac without Xcode CLT still
-triggered the Xcode CLT install dialog.
+- bootstrap falls back to a GitHub tarball when only the macOS `/usr/bin/git`
+  developer-tool stub is present
+- installer uses Pixi and avoids macOS `python3`, Homebrew, and
+  `install_name_tool`
+- `ffmpeg` is provided by the Pixi environment
+- `scripts/test_mac_setup.sh` passes against real audio and real mlx-whisper
+- installer creates `~/Applications/Whisper Hotkey.app`
+- launching the app with `open ~/Applications/Whisper\ Hotkey.app` starts the
+  daemon and writes logs to `~/Library/Logs/Whisper Hotkey/daemon.log`
 
-**Root cause:** macOS ships `/usr/bin/git` as a stub. Two earlier guards both
-failed:
-1. `command -v git` — found the stub, returned true.
-2. `xcode-select -p` — returned 0 because `/Library/Developer/CommandLineTools`
-   exists as a placeholder path even without CLT installed.
+The remaining on-device work is the GUI-only path: double-click the app, grant
+Microphone + Accessibility to **Whisper Hotkey**, then confirm hotkey-to-paste in
+a real text field.
 
-**Fix applied (commit `98c408c` → `<latest>` on this branch):** `git_works()`
-now checks the binary **path** — the macOS stub is always exactly `/usr/bin/git`;
-a real git (from CLT or Homebrew) lands elsewhere. If the path is the stub, skip
-to the tarball. The tarball path uses `curl` + `tar` (both built into macOS, no
-CLT needed).
-
-**Second symptom:** bootstrap reached `Running installer…`, then failed with:
-`bash: install.sh: No such file or directory`.
-
-**Root cause:** the raw bootstrap script was loaded from `feat/multi-platform-backends`,
-but its internal `REPO_REF` default still pointed at `main`. The current `main`
-branch does not contain `install.sh`, so bootstrap downloaded the wrong archive.
-
-**Fix applied:** `bootstrap.sh` now checks that `install.sh` exists before
-running it, so this failure mode reports the wrong-ref/archive problem clearly.
-Once this branch is merged to `main`, the normal `main` one-liner is correct.
-
-**First thing to do:** re-run the one-liner and confirm it goes straight to the
-tarball download without touching git or triggering any CLT dialog:
+To re-test from a clean Mac install, run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/feat/multi-platform-backends/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/danieljelinko/whisper-hotkey-daemon/main/bootstrap.sh | bash
 ```
 
 Expected output after the directory prompt:
@@ -74,9 +64,12 @@ If you still see a CLT dialog, check:
 ### Step 1 — Grant macOS permissions (required before daemon runs)
 
 ```
-System Settings → Privacy & Security → Microphone    → enable Terminal (or your terminal app)
-System Settings → Privacy & Security → Accessibility → enable Terminal (or your terminal app)
+System Settings → Privacy & Security → Microphone    → enable Whisper Hotkey
+System Settings → Privacy & Security → Accessibility → enable Whisper Hotkey
 ```
+
+If testing `./run.sh` directly instead of the app, grant both permissions to the
+terminal app used to launch it.
 
 ### Step 2 — Run the smoke test
 
@@ -92,13 +85,13 @@ Checks all pass? The backend works.
 ### Step 3 — Manual hotkey test
 
 ```bash
-./run.sh
+open ~/Applications/Whisper\ Hotkey.app
 ```
 
 Open any text editor, click in it, then hold **Ctrl+Option+Space**, speak a
 sentence, release Ctrl. Text should be pasted. Watch the log:
 ```bash
-tail -f ~/whisper_hotkey_mac.log
+tail -f ~/Library/Logs/Whisper\ Hotkey/daemon.log
 ```
 
 ---
@@ -106,7 +99,7 @@ tail -f ~/whisper_hotkey_mac.log
 ## Repo orientation
 
 ```
-run.sh                          single entry point (auto-detects Mac → mlx)
+run.sh                          CLI entry point (auto-detects Mac → mlx)
 install.sh                      one-stop installer (called by bootstrap.sh)
 bootstrap.sh                    curl-installable; tarball fallback for no-git Macs
 src/
@@ -114,6 +107,7 @@ src/
   whisper_hotkey_mac_experimental.py  hotkey + record + paste daemon (Mac)
   backend_select.py             pure dispatch logic (Darwin → "mlx")
 scripts/
+  create_mac_app.sh             generates ~/Applications/Whisper Hotkey.app
   lib/backend_mlx.sh            launches the mlx server
   test_mac_setup.sh             smoke test (run this first)
   101_install_whispercpp.sh     optional: builds whisper.cpp Metal as fallback
@@ -123,7 +117,7 @@ tests/
   test_run_dispatch.sh          shell dispatch smoke tests
 docs/
   mac_setup.md                  full Mac setup guide
-01_plan.md                      what's done / what's next (Phase 2.3–2.4 still open)
+01_plan.md                      what's done / what's next
 03_decisions.md                 key decisions + rationale
 04_learnings.md                 non-obvious gotchas (read before touching things)
 ```
@@ -140,10 +134,13 @@ bash tests/test_run_dispatch.sh  # 6 tests
 
 From `01_plan.md`:
 
-- **2.3** `scripts/test_mac_setup.sh` passes green on the Air (model downloads, transcribes)
 - **2.4** Manual hotkey→paste works; permissions granted; model/RAM tuned if needed
-  - 8 GB is tight for non-quantized `large-v3-turbo`; default to `mlx-community/whisper-large-v3-turbo-q4`
-  - Record any later model changes in `03_decisions.md`
+- **4.4** Double-click `Whisper Hotkey.app`, grant permissions to that app,
+  confirm manual hotkey→paste
+
+8 GB is tight for non-quantized `large-v3-turbo`; keep the default at
+`mlx-community/whisper-large-v3-turbo-q4` unless a later on-device test proves a
+better tradeoff. Record any later model changes in `03_decisions.md`.
 
 Phase 3 (Windows, Parakeet, Voxtral) is future work, not committed.
 
@@ -152,7 +149,8 @@ Phase 3 (Windows, Parakeet, Voxtral) is future work, not committed.
 ## Known constraints (from 04_learnings.md)
 
 - `mlx_whisper` only imports on Apple Silicon — the contract test mocks the boundary
-- First transcription downloads model lazily (~1.5 GB); pre-warm with `test_mac_setup.sh`
+- First transcription downloads model lazily and can take minutes; pre-warm with `test_mac_setup.sh`
 - macOS `/usr/bin/git` is a stub — **do not call git without checking the path**
-- `pynput` + `pyautogui` both need Accessibility permission granted in System Settings
-- Microphone permission is requested silently on first recording; if it fails, check System Settings
+- The daemon uses `pbcopy` + AppleScript paste on macOS to avoid `pyautogui`
+- Microphone and Accessibility permission must be granted to **Whisper Hotkey**
+  when launched as the app, or to the terminal app when launched manually

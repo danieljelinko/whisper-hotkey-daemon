@@ -31,7 +31,7 @@ mocked, and the real inference is verified on-device.
 - [x] 2.0 `mlx_whisper_server.py` (Flask, lazy mlx import) + `test_mlx_server.py` (mocked boundary)
 - [x] 2.1 `lib/backend_mlx.sh` + `run.sh` mlx case; `backend_select` Darwin→`mlx`
 - [x] 2.2 installer/bootstrap drop Homebrew on Mac (uv wheels only); `scripts/test_mac_setup.sh` for mlx
-- [ ] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
+- [x] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
 - [ ] 2.4 **on-device:** manual hotkey→paste check; grant Mic + Accessibility; tune model/RAM on 8 GB
 - [x] 2.5 tarball-based bootstrap (curl fallback when git absent) → zero Xcode CLT for end users
 
@@ -43,8 +43,8 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [ ] 3.3 Voxtral-Mini-4B backend via vLLM (OpenAI-compatible) — **needs a 4-bit quantized (AWQ/GPTQ) build to fit this box's 8 GB VRAM**; bf16 wants ≥16 GB
 
 ## Phase 4 — Mac app wrapper / user-facing install
-- [ ] 4.1 Generate `Whisper Hotkey.app` during Mac install, without Xcode/CLT
-- [ ] 4.2 App launch runs the existing `run.sh` with logs and duplicate-run guard
-- [ ] 4.3 Permissions attach to `Whisper Hotkey.app` where macOS allows it; docs explain Mic + Accessibility
+- [x] 4.1 Generate `Whisper Hotkey.app` during Mac install, without Xcode/CLT
+- [x] 4.2 App launch runs the existing `run.sh` with logs and duplicate-run guard
+- [x] 4.3 Permissions attach to `Whisper Hotkey.app` where macOS allows it; docs explain Mic + Accessibility
 - [ ] 4.4 On-device: double-click app, grant permissions, confirm manual hotkey→paste
 - [ ] 4.5 Future polish: menu bar controller, launch-at-login toggle, icon, signing/notarization/DMG
