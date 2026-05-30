@@ -114,6 +114,18 @@ grep -q "can take several minutes" "$bootstrap_out" && \
     ok "bootstrap.sh runs smoke test automatically on macOS" || \
     fail "bootstrap.sh runs smoke test automatically on macOS"
 
+grep -q "WHAT TO DO NEXT" "$bootstrap_out" && \
+    ok "bootstrap.sh prints final next-step section" || \
+    fail "bootstrap.sh prints final next-step section"
+
+grep -q "4. Launch the application:" "$bootstrap_out" && \
+    ok "bootstrap.sh gives numbered app launch step" || \
+    fail "bootstrap.sh gives numbered app launch step"
+
+grep -q "Privacy & Security → Microphone → enable tigris-whisper" "$bootstrap_out" && \
+    ok "bootstrap.sh gives explicit Microphone permission step" || \
+    fail "bootstrap.sh gives explicit Microphone permission step"
+
 # ─── uninstall.sh: removes generated app/state/logs/model/install dir safely ──
 
 mkdir -p \

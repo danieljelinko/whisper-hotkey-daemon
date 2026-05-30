@@ -133,7 +133,7 @@ docs/
 ```bash
 uv run pytest -q                    # 11 Python tests
 bash tests/test_run_dispatch.sh      # 6 shell assertions
-bash tests/test_install_uninstall.sh # 17 shell assertions
+bash tests/test_install_uninstall.sh # 20 shell assertions
 ```
 
 ---
