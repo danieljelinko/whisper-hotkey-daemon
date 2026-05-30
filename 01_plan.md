@@ -37,7 +37,7 @@ mocked, and the real inference is verified on-device.
 - [x] 2.1 `lib/backend_mlx.sh` + `run.sh` mlx case; `backend_select` Darwin→`mlx`
 - [x] 2.2 installer/bootstrap drop Homebrew on Mac (Pixi wheels/env only); `scripts/test_mac_setup.sh` for mlx
 - [x] 2.3 **on-device (the Air):** run `scripts/test_mac_setup.sh` → model downloads + transcribes
-- [ ] 2.4 **on-device:** manual hotkey→paste check; grant Mic + Accessibility; tune model/RAM on 8 GB
+- [ ] 2.4 **on-device:** launch app first, trigger/grant Mic + Accessibility, confirm hotkey→paste; tune model/RAM on 8 GB
 - [x] 2.5 tarball-based bootstrap (curl fallback when git absent) → zero Xcode CLT for end users
 
 ## Phase 3 — Optional future backends / platforms (not committed; see 03_decisions)
@@ -51,7 +51,7 @@ client change. All GPU options below are **Linux+NVIDIA only** — none help the
 - [x] 4.1 Generate `tigris-whisper.app` during Mac install, without Xcode/CLT
 - [x] 4.2 App launch runs the existing `run.sh` with logs and duplicate-run guard
 - [x] 4.3 Permissions attach to `tigris-whisper.app` where macOS allows it; docs explain Mic + Accessibility
-- [ ] 4.4 On-device: double-click app, grant permissions, confirm manual hotkey→paste
+- [ ] 4.4 On-device: launch `tigris-whisper.app` from Finder or `open`, trigger/grant permissions, confirm manual hotkey→paste
 - [x] 4.5 Add tested uninstall path for app wrapper, logs/state, install dir, and downloaded model cache
 - [x] 4.6 Rename user-facing product/repo to `tigris-whisper` after GitHub repo rename is coordinated
 - [x] 4.7 Bootstrap automatically runs Mac smoke test/model warmup and makes app launch the normal user path

@@ -1,12 +1,14 @@
 # 02 · Progress
 
 ## In flight
-- Phase 4.4: manual GUI test — double-click **tigris-whisper.app**, grant
-  Microphone + Accessibility, confirm hotkey→paste in a real text field.
+- Phase 4.4: manual GUI test — launch **tigris-whisper.app** from Finder or
+  `open`, trigger/grant Microphone + Accessibility, confirm hotkey→paste in a
+  real text field.
 
 ## Next
-- On the Air: install generated app → double-click → grant Mic + Accessibility
-  to **tigris-whisper** → manual hotkey→paste check.
+- On the Air: install generated app → launch it first so macOS can request
+  Microphone → grant/verify Mic + Accessibility for **tigris-whisper** →
+  manual hotkey→paste check.
 
 ## Blocked
 - Manual permission/hotkey validation still requires the Mac UI session. SSH can
@@ -15,7 +17,7 @@
 ## Done
 | Date | Task | Verified by |
 |---|---|---|
-| 2026-05-30 | Phase 4.7: bootstrap runs smoke test/model warmup automatically | `tests/test_install_uninstall.sh` → 20 passed; covers fake-mac bootstrap invoking smoke test, warning that model download can take several minutes, and final numbered `WHAT TO DO NEXT` app-launch instructions |
+| 2026-05-30 | Phase 4.7: bootstrap runs smoke test/model warmup automatically | `tests/test_install_uninstall.sh` → 22 passed; covers fake-mac bootstrap invoking smoke test, warning that model download can take several minutes, final numbered `WHAT TO DO NEXT`, Finder launch, and Microphone-after-first-request guidance |
 | 2026-05-30 | Phase 4.6: renamed user-facing product/repo to `tigris-whisper` | GitHub repo renamed first; source now uses `danieljelinko/tigris-whisper`, `~/Developer/tigris-whisper`, `tigris-whisper.app`, `com.danieljelinko.tigris-whisper`; `tests/test_install_uninstall.sh` covers renamed app/install paths |
 | 2026-05-30 | Phase 4.5: uninstall script added with tests | `tests/test_install_uninstall.sh` covers fake-mac install wrapper creation and temp-HOME uninstall of app/logs/state/model cache/install dir |
 | 2026-05-30 | Phase 4.1–4.3: generated app wrapper | SSH to M1 Air verified the app-wrapper launch path before rename; current `tigris-whisper.app` bundle name, id, logs, and state paths are covered by `tests/test_install_uninstall.sh` |

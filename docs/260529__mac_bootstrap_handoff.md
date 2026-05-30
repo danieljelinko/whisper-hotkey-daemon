@@ -40,9 +40,10 @@ install/uninstall tests until the next clean Mac run:
 - `./uninstall.sh` removes the app wrapper, logs/state, known project model
   cache, and optionally the install directory / Pixi
 
-The remaining on-device work is the GUI-only path: double-click the app, grant
-Microphone + Accessibility to **tigris-whisper**, then confirm hotkey-to-paste in
-a real text field.
+The remaining on-device work is the GUI-only path: launch the app from Finder
+or `open`, let macOS request Microphone, grant/verify Microphone +
+Accessibility for **tigris-whisper**, then confirm hotkey-to-paste in a real
+text field.
 
 To re-test from a clean Mac install, run:
 
@@ -67,7 +68,17 @@ If you still see a CLT dialog, check:
 
 ## After bootstrap succeeds
 
-### Step 1 — Grant macOS permissions (required before daemon runs)
+### Step 1 — Launch app first
+
+```bash
+open ~/Applications/tigris-whisper.app
+```
+
+You can also use Finder → Applications → double-click `tigris-whisper.app`.
+Launching first matters because macOS may not show the app under Microphone
+until it has requested access once.
+
+### Step 2 — Grant macOS permissions (required)
 
 ```
 System Settings → Privacy & Security → Microphone    → enable tigris-whisper
@@ -77,7 +88,7 @@ System Settings → Privacy & Security → Accessibility → enable tigris-whisp
 If testing `./run.sh` directly instead of the app, grant both permissions to the
 terminal app used to launch it.
 
-### Step 2 — Run the smoke test
+### Step 3 — Run the smoke test
 
 ```bash
 cd ~/Developer/tigris-whisper
@@ -88,7 +99,7 @@ This starts the mlx-whisper server, **downloads the Whisper model (~1.5 GB on
 first run** — this can take several minutes), POSTs a real WAV, and asserts you get text back.
 Checks all pass? The backend works.
 
-### Step 3 — Manual hotkey test
+### Step 4 — Manual hotkey test
 
 ```bash
 open ~/Applications/tigris-whisper.app
@@ -133,7 +144,7 @@ docs/
 ```bash
 uv run pytest -q                    # 11 Python tests
 bash tests/test_run_dispatch.sh      # 6 shell assertions
-bash tests/test_install_uninstall.sh # 20 shell assertions
+bash tests/test_install_uninstall.sh # 22 shell assertions
 ```
 
 ---
@@ -142,9 +153,10 @@ bash tests/test_install_uninstall.sh # 20 shell assertions
 
 From `01_plan.md`:
 
-- **2.4** Manual hotkey→paste works; permissions granted; model/RAM tuned if needed
-- **4.4** Double-click `tigris-whisper.app`, grant permissions to that app,
-  confirm manual hotkey→paste
+- **2.4** App launch triggers/grants permissions; manual hotkey→paste works;
+  model/RAM tuned if needed
+- **4.4** Launch `tigris-whisper.app` via Finder or `open`, grant permissions
+  to that app, confirm manual hotkey→paste
 
 8 GB is tight for non-quantized `large-v3-turbo`; keep the default at
 `mlx-community/whisper-large-v3-turbo-q4` unless a later on-device test proves a

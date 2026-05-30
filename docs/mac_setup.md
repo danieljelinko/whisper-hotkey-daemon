@@ -68,6 +68,9 @@ After install, launch the app wrapper:
 open ~/Applications/tigris-whisper.app
 ```
 
+You can also open **Finder → Applications** and double-click
+**tigris-whisper.app**.
+
 This is the normal user path. The app runs the same local daemon as `./run.sh`,
 but gives macOS a named app for Microphone and Accessibility permissions. It
 writes logs to:
@@ -82,13 +85,13 @@ instead, grant permissions to your terminal app, not `tigris-whisper`.
 ## 3. Grant macOS permissions
 
 **This step is required.** Without it, the daemon starts but recording and/or
-paste will silently fail. If you launch the app wrapper, grant permissions to
-**tigris-whisper**. If you run `./run.sh` manually, grant permissions to your
-terminal app.
+paste will silently fail. Launch the app first so macOS can ask for Microphone
+access; the app may not appear in Microphone settings until it has asked once.
+If you run `./run.sh` manually, grant permissions to your terminal app instead.
 
 ### Microphone
 > System Settings → Privacy & Security → **Microphone**
-> Enable **tigris-whisper** (or your terminal app if running `./run.sh`)
+> Enable **tigris-whisper** after the app has requested access
 
 ### Accessibility (hotkey + paste)
 > System Settings → Privacy & Security → **Accessibility**

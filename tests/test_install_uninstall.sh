@@ -118,11 +118,19 @@ grep -q "WHAT TO DO NEXT" "$bootstrap_out" && \
     ok "bootstrap.sh prints final next-step section" || \
     fail "bootstrap.sh prints final next-step section"
 
-grep -q "4. Launch the application:" "$bootstrap_out" && \
+grep -q "1. Launch the application:" "$bootstrap_out" && \
     ok "bootstrap.sh gives numbered app launch step" || \
     fail "bootstrap.sh gives numbered app launch step"
 
-grep -q "Privacy & Security → Microphone → enable tigris-whisper" "$bootstrap_out" && \
+grep -q "Finder → Applications → double-click tigris-whisper.app" "$bootstrap_out" && \
+    ok "bootstrap.sh includes Finder launch path" || \
+    fail "bootstrap.sh includes Finder launch path"
+
+grep -q "may not appear in Microphone settings until it asks once" "$bootstrap_out" && \
+    ok "bootstrap.sh explains Microphone appears after first request" || \
+    fail "bootstrap.sh explains Microphone appears after first request"
+
+grep -q "4. Confirm Microphone is enabled:" "$bootstrap_out" && \
     ok "bootstrap.sh gives explicit Microphone permission step" || \
     fail "bootstrap.sh gives explicit Microphone permission step"
 
